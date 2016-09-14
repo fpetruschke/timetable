@@ -1,50 +1,44 @@
 package main;
 
 import com.mongodb.MongoClient;
-import com.mongodb.MongoException;
-import com.mongodb.WriteConcern;
-
 import com.mongodb.DB;
-import com.mongodb.DBCollection;
-import com.mongodb.BasicDBObject;
-import com.mongodb.DBObject;
-import com.mongodb.DBCursor;
-
-import com.mongodb.ServerAddress;
-import java.util.Arrays;
 
 /**
  * class DatabaseConnector
  * 
  * Creating and closing the database connection
  * 
- * @author petrusp
+ * @author f.petruschke
  *
  */
-public class DatabaseConntector {
+public class DatabaseConnector {
 
-	public static String host = "localhost";
-	public static int port = 27017;
-	public static String databaseName = "test";
+	private static String host = "localhost";
+	private static int port = 27017;
+	private static String databaseName = "test";
 	public static MongoClient mongoClient;
+	public static DB db;
+	
+	DatabaseConnector() throws Exception {
+		connectDb();
+	}
 	
 	/**
 	 * method connectDb
 	 * 
 	 * connects to the running mongodb server and returns the database object
 	 * 
-	 * @return
 	 * @throws Exception
 	 */
-	public static DB connectDb() throws Exception {
+	private static void connectDb() throws Exception {
 		try{    	  
 			// To connect to mongodb server
 			mongoClient = new MongoClient(host, port);
 			// Now connect to your databases
-			DB db = mongoClient.getDB(databaseName);
+			DB openedDb = mongoClient.getDB(databaseName);
 			System.out.println("Connection to database successfully");
  
-			return db;
+			db = openedDb;
 			
       } catch(Exception e) {
     	  System.err.println( e.getClass().getName() + ": " + e.getMessage() );

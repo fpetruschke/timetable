@@ -2,42 +2,24 @@
 
 Florian: "Bei mir im Betrieb wird mit Massendaten gearbeitet. Bisher habe ich mich nur mit SQL und MySQL auseinandergesetzt. Da wir allerdings für bestimmte Funktionalitäten - mit denen ich bisher noch nicht in Berührung gekommen bin - MongoDB verwenden, war es mir ein Anliegen, mich für die Praxis zu wappnen. Daher meine Entscheidung für MongoDB.
 
+Daniel: -- folgt --
+
 # Installation
 
-* MongoDB muss installiert werden (Betriebssystemabhängige Installation - wird hier nicht näher erläutert.)
-* Der Pfad für den zu verwendenden Daten-Ordner muss angelegt werden (Standardmäßig ist dies "/data/db/")
-* Die Java-Bibliothek für die Nutzung von MongoDB muss in das Java-Projekt inkludiert werden (https://oss.sonatype.org/content/repositories/releases/org/mongodb/mongo-java-driver/3.3.0/)
+* MongoDB muss installiert werden (Betriebssystemabhängige Installation - wird hier nicht näher erläutert.)  
+* Der Pfad für den zu verwendenden Daten-Ordner muss angelegt werden (Standardmäßig ist dies "/data/db/")  
+* Die Java-Bibliothek für die Nutzung von MongoDB muss in das Java-Projekt inkludiert werden (https://oss.sonatype.org/content/repositories/releases/org/mongodb/mongo-java-driver/3.3.0/)  
 
 # Stammdaten
 
-Wir haben uns unsere Stammdaten direkt im json-Format generieren lassen: 
-
-http://beta.json-generator.com
-
-Unser verwendetes Schema:
-
-[
-  {
-    'repeat(5, 10)': {
-      _id: '{{objectId()}}',
-      isActive: '{{bool()}}',
-      age: '{{integer(16, 30)}}',
-      name: {
-        first: '{{firstName()}}',
-        last: '{{surname()}}'
-      },
-      classname: 'IT-{{integer(1, 4)}}{{random("a","b","c")}}'
-    }
-  }
-]
-
-Ein Beispieldatensatz liegt in der "exampleDataStudents.json"
+Die Stammdaten (Collection und Documents) werden beim Starten der Anwendung erzeugt.  
+Bestehende Stammdaten werden allerdings zuvor gelöscht, damit keine Duplikate entstehen.  
 
 # Vokabular
 
-- Collection -> "Tabelle" db.students
-- Document -> "Zeile" db.students.findOne()
-- ObjectId -> beim Erstellen automatisch generierter, eindeutiger Schlüssel (vgl mysql PrimaryKey)
+- Collection -> "Tabelle" z.B. db.students  
+- Document -> "Zeile" z.B. db.students.findOne()  
+- ObjectId -> beim Erstellen automatisch generierter, eindeutiger Schlüssel (vgl mysql PrimaryKey)  
 
 # Basis-Befehle
 
@@ -68,14 +50,28 @@ Ein Beispieldatensatz liegt in der "exampleDataStudents.json"
 | db.students.aggregate({$group : {_id: "$age", avgAge: {$avg : 1} } })    | Durchschnittswert einer Ergebnismenge	| GROUP + AVG 	 |
 | db.students.aggregate({$group : {_id: "$age", oldest: {$max : $age} } }) | Durchschnittswert einer Ergebnismenge	| GROUP + AVG 	 |
 
-# INDIZES
+# Indizes
 
 Indizes sorgen dafür, dass DB-Abfragen deutlich effizienter ablaufen.  
 Wann immer z.B. mit einer Bedingung das Suchergebnis gefiltert werden soll, beschleunigt das vorherige Hinzufügen eines Index die Abfrage.   
 Indizes sollten immer nur bei häufig verwendeten Filter-Spalten verwendet werden.  
 Je mehr Indizes bestehen, desto weniger bringt die Verwendung von Indizes.  
 
-* db.students.ensureIndex({"age":1}) 	--> nutze das Alter als Suchindex
-* db.students.getIndexes() 				--> zeigt die angelegten Indizes der Collection
+* db.students.ensureIndex({"age":1}) 	--> nutze das Alter als Suchindex  
+* db.students.getIndexes() 				--> zeigt die angelegten Indizes der Collection  
 
+# Probleme
 
+Am meisten Probleme hat uns die andere Denkweise von NoSQL - hier: mongoDB - bereitet. Es ist schwierig umzudenken, wenn man es gewohnt ist, mit relationalen Datenbanken zu arbeiten.  
+Bei der Arbeit mit mongoDB mussten wir versuchen, zu "de-normalisieren".  Wir sind es gewohnt, überall Fremdschlüssel zu nutzen und alle Einträge relational zu tätigen.  
+Das ist mit NoSQL nicht möglich.  
+
+# Arbeitsschritte
+
+- [x] Aufbau der Projektstruktur mit Trennung von Controllern und Gui  
+- [ ] [WIP] Erstellen des GUIs  
+- [x] Installation von mongoDB  
+- [x] Herstellen einer Verbindung zum lokalen mongoDB server  
+- [x] Erstellen erster Standard-Abfragen (Select, insert, delete)  
+- [ ] [WIP] Erstellen einer Tabelle, die mit Daten aus der mongoDB gespeist wird  
+- [ ] Erstellen von CRUD-Funktionalität im GUI  
