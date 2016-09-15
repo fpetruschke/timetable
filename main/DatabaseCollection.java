@@ -1,6 +1,5 @@
 package main;
 
-import com.mongodb.DB;
 import com.mongodb.DBCollection;
 
 /**

@@ -1,22 +1,20 @@
 package main;
 
-import java.awt.Color;
-import java.awt.FlowLayout;
-import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
 
 import javax.swing.*;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
 
-import com.mongodb.BasicDBObject;
-import com.mongodb.DBCollection;
+import com.mongodb.BasicDBList;
 import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
 
 import javax.swing.table.DefaultTableModel;
 import javax.swing.border.BevelBorder;
+
+import org.bson.BasicBSONObject;
+import org.bson.types.BasicBSONList;
 
 /**
  * class TimetableWindow
@@ -26,6 +24,7 @@ import javax.swing.border.BevelBorder;
  * @author f.petruschke
  *
  */
+@SuppressWarnings("serial")
 public class TimetableWindow extends JFrame {
 	private final JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.TOP);
 	private JTable table;
@@ -47,9 +46,7 @@ public class TimetableWindow extends JFrame {
 			table = new JTable();
 			table.setBorder(new BevelBorder(BevelBorder.RAISED, null, null, null, null));
 			panel.add(table);
-			
-			DBCollection timeslots = DatabaseConnector.db.getCollection("timeslots");			
-			
+						
 			DBObject timeslot1 = DatabaseQueries.findOneInCollection("timeslots", "from", "7:45");
 			DBObject timeslot2 = DatabaseQueries.findOneInCollection("timeslots", "from", "8:30");
 			DBObject timeslot3 = DatabaseQueries.findOneInCollection("timeslots", "from", "9:30");
@@ -78,12 +75,12 @@ public class TimetableWindow extends JFrame {
 					"", "Uhrzeit", "Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag"
 				}
 			));
-			table.getColumnModel().getColumn(0).setPreferredWidth(95);
-			table.getColumnModel().getColumn(1).setPreferredWidth(91);
-			table.getColumnModel().getColumn(2).setPreferredWidth(93);
-			table.getColumnModel().getColumn(3).setPreferredWidth(101);
-			table.getColumnModel().getColumn(4).setPreferredWidth(98);
-			table.getColumnModel().getColumn(5).setPreferredWidth(97);
+			table.getColumnModel().getColumn(0).setPreferredWidth(22);
+			table.getColumnModel().getColumn(1).setPreferredWidth(130);
+			table.getColumnModel().getColumn(2).setPreferredWidth(80);
+			table.getColumnModel().getColumn(3).setPreferredWidth(100);
+			table.getColumnModel().getColumn(4).setPreferredWidth(110);
+			table.getColumnModel().getColumn(5).setPreferredWidth(90);
 			
 			
 			// ##################################################################
@@ -113,7 +110,7 @@ public class TimetableWindow extends JFrame {
 					try {
 						DatabaseConnector.closeConnection();
 					} catch (Exception e1) {
-						// TODO Auto-generated catch block
+						System.out.println("Connection could not be closed!");
 						e1.printStackTrace();
 					}
 					System.exit(0);
@@ -121,34 +118,51 @@ public class TimetableWindow extends JFrame {
 			});
 			btnNewButton.setBounds(649, 321, 117, 25);
 			getContentPane().add(btnNewButton);
-
-			//aktualisiereSchiffListe();
+			
+			JButton btnNewButton_1 = new JButton("Log Rooms, Teachers and Courses");
+			btnNewButton_1.addActionListener(new ActionListener() {
+				@SuppressWarnings("unchecked")
+				public void actionPerformed(ActionEvent e) {
+					
+					String[] weekdayShortnames = new String[] { "Mo", "Di", "Mi", "Do", "Fr" };
+					String[] timeslotStarts = new String[] { "7:45", "8:30", "9:30", "10:15", "11:30", "12:15", "13:30", "14:15", "15:15", "16:00" };
+					String[] filters = new String[] { "room", "course", "teachers" };
+					
+					for(String weekdayShortname : weekdayShortnames) {
+						for (String timeslotStart : timeslotStarts) {
+							
+							DBObject weekday = DatabaseQueries.findOneInCollection("weekdays", "shortname", weekdayShortname);
+							DBObject timeslot = DatabaseQueries.findOneInCollection("timeslots", "from", timeslotStart);
+							
+							DBCursor cursor = DatabaseQueries.findOneInCollectionAnd("timetable", "weekday", weekday, "timeslot", timeslot);
+							
+							String result = "";
+							while(cursor.hasNext()) {
+								DBObject element = cursor.next();
+								for(String filter : filters) {
+									Object object = element.get(filter); 
+									// if object is BasicDBList of teacher
+									if(object instanceof BasicDBList) {
+										for (int i = 0; i < ((ArrayList<Object>) object).size(); i++) {
+											Object listElement = ((BasicBSONList) object).get(i);
+											Object teacher = ((BasicBSONObject) listElement).get("teacher");
+											String teacherName = (String) ((BasicBSONObject) teacher).get("name"); 
+											result += teacherName + ", ";
+										}
+									} else {
+										String name = (String) ((BasicBSONObject) object).get("name");
+										result += name + ", ";
+									}
+								}
+								// result the value of the room, the course and the teacher/s
+								System.out.println(result);
+							}
+						}
+					}
+				}
+			});
+			btnNewButton_1.setBounds(585, 229, 304, 25);
+			getContentPane().add(btnNewButton_1);
 
 		}
-
-		public void aktualisiereSchiffListe() throws Exception{
-			//DefaultListModel daten = new DefaultListModel();
-
-			/*SchiffDatenbankZugriff schiffZugriff = new SchiffDatenbankZugriff();
-			//Hinzufügen der Schiffe aus der Array-Liste
-			for (Schiff einSchiff : schiffZugriff.leseSchiffe()) {
-				daten.addElement(einSchiff);
-			}
-			//Zuweisen des DefaultListModel zur JList 
-			schiffListe.setModel(daten);*/
-			
-			//DBCollection collection = DatabaseCollection.createCollection(db, "students");
-			
-			
-			DBCursor cursor = DatabaseQueries.showAllFromCollection("students");
-			while (cursor.hasNext()) { 
-			   /*System.out.println(cursor.next());
-			   String firstname = cursor.next().get("firstname");
-			   lab1.setText(firstname);*/
-				BasicDBObject obj = (BasicDBObject) cursor.next();
-				//lab1.setText(obj.getString("firstname"));
-			    //result.add(obj.getString("HomeTown"));
-			}
-		}
-	
 }

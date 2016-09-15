@@ -35,6 +35,7 @@ public class DatabaseConnector {
 			// To connect to mongodb server
 			mongoClient = new MongoClient(host, port);
 			// Now connect to your databases
+			@SuppressWarnings("deprecation")
 			DB openedDb = mongoClient.getDB(databaseName);
 			System.out.println("Connection to database successfully");
  

@@ -5,8 +5,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import com.mongodb.BasicDBObject;
 import com.mongodb.DBCursor;
 
 /**

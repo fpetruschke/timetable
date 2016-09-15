@@ -1,5 +1,8 @@
 package main;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.bson.types.ObjectId;
 
 import com.mongodb.BasicDBList;
@@ -161,20 +164,67 @@ public class DatabaseQueries {
 	}
 	
 	/**
-	 * method findOneInCollection
+	 * method findOneInCollection (pure strings)
 	 * 
 	 * Returns one result from collection for the given key/value pair
 	 * 
-	 * @param collectionName	Name of the collection
-	 * @param key				Name of the key to search for
-	 * @param value				Name of the value the key has
-	 * @return					Returns the matching DBObject
+	 * @param collectionName	String		Name of the collection
+	 * @param key				String		Name of the key to search for
+	 * @param value				String		Name of the value the key has
+	 * @return					DBObject	Returns the matching DBObject
 	 */
 	public static DBObject findOneInCollection(String collectionName, String key, String value) {
 		DBCollection collection = DatabaseConnector.db.getCollection(collectionName);
 		DBObject query = new BasicDBObject(key, value);
 		DBObject result = collection.findOne(query);
 		return result;
+	}
+	
+	/**
+	 * 
+	 * @param collectionName
+	 * @param key
+	 * @param value
+	 * @param andKey
+	 * @param andValue
+	 * @return
+	 */
+	public static DBCursor findOneInCollectionAnd(String collectionName, String key, DBObject value, String andKey, DBObject andValue) {
+		DBCollection collection = DatabaseConnector.db.getCollection(collectionName);
+		BasicDBObject andQuery = new BasicDBObject();
+	    List<BasicDBObject> obj = new ArrayList<BasicDBObject>();
+	    obj.add(new BasicDBObject(key, value));
+	    obj.add(new BasicDBObject(andKey, andValue));
+	    andQuery.put("$and", obj);
+	    DBCursor cursor = collection.find(andQuery);
+		
+		return cursor;
+	}
+	
+	/**
+	 * 
+	 * @param collectionName
+	 * @param key
+	 * @param value
+	 * @param andKey
+	 * @param andValue
+	 * @return
+	 */
+	public static DBCursor findOneInCollectionAnd(String collectionName, String key, String value, String andKey, String andValue) {
+		//DBCollection collection = DatabaseConnector.db.getCollection(collectionName);
+		//DBObject query = new BasicDBObject(key, value);
+		//query.put(andKey, andValue);
+		//DBObject result = collection.findOne(query);
+		
+		DBCollection collection = DatabaseConnector.db.getCollection(collectionName);
+		BasicDBObject andQuery = new BasicDBObject();
+	    List<BasicDBObject> obj = new ArrayList<BasicDBObject>();
+	    obj.add(new BasicDBObject(key, value));
+	    obj.add(new BasicDBObject(andKey, andValue));
+	    andQuery.put("$and", obj);
+	    DBCursor cursor = collection.find(andQuery);
+		
+		return cursor;
 	}
 	
 	/**
