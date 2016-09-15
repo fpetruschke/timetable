@@ -1,5 +1,7 @@
 package main;
 
+import java.awt.Component;
+import java.awt.Frame;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
@@ -26,6 +28,7 @@ import org.bson.types.BasicBSONList;
  */
 @SuppressWarnings("serial")
 public class TimetableWindow extends JFrame {
+	protected static final Component JFrame = null;
 	private final JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.TOP);
 	private JTable table;
 
@@ -36,16 +39,12 @@ public class TimetableWindow extends JFrame {
 			super(t);
 			setTitle("Stundenplanverwaltung");
 			getContentPane().setLayout(null);
-			tabbedPane.setBounds(105, 5, 468, 459);
+			//tabbedPane.setBounds(99, 257, 468, 459);
 			
-			getContentPane().add(tabbedPane);
+			//getContentPane().add(tabbedPane);
 			
 			JPanel panel = new JPanel();
-			tabbedPane.addTab("Stundenplan", null, panel, null);
-			
-			table = new JTable();
-			table.setBorder(new BevelBorder(BevelBorder.RAISED, null, null, null, null));
-			panel.add(table);
+			//tabbedPane.addTab("Stundenplan", null, panel, null);
 						
 			DBObject timeslot1 = DatabaseQueries.findOneInCollection("timeslots", "from", "7:45");
 			DBObject timeslot2 = DatabaseQueries.findOneInCollection("timeslots", "from", "8:30");
@@ -57,30 +56,6 @@ public class TimetableWindow extends JFrame {
 			DBObject timeslot8 = DatabaseQueries.findOneInCollection("timeslots", "from", "14:15");
 			DBObject timeslot9 = DatabaseQueries.findOneInCollection("timeslots", "from", "15:15");
 			DBObject timeslot10 = DatabaseQueries.findOneInCollection("timeslots", "from", "16:00");
-			
-			table.setModel(new DefaultTableModel(
-				new Object[][] {
-					{"1", timeslot1.get("from") + " - " + timeslot1.get("until"), null, null, null, null, null},
-					{"2", timeslot2.get("from") + " - " + timeslot2.get("until"), null, null, null, null, null},
-					{"3", timeslot3.get("from") + " - " + timeslot3.get("until"), null, null, null, null, null},
-					{"4", timeslot4.get("from") + " - " + timeslot4.get("until"), null, null, null, null, null},
-					{"5", timeslot5.get("from") + " - " + timeslot5.get("until"), null, null, null, null, null},
-					{"6", timeslot6.get("from") + " - " + timeslot6.get("until"), null, null, null, null, null},
-					{"7", timeslot7.get("from") + " - " + timeslot7.get("until"), null, null, null, null, null},
-					{"8", timeslot8.get("from") + " - " + timeslot8.get("until"), null, null, null, null, null},
-					{"9", timeslot9.get("from") + " - " + timeslot9.get("until"), null, null, null, null, null},
-					{"10", timeslot10.get("from") + " - " + timeslot10.get("until"), null, null, null, null, null},
-				},
-				new String[] {
-					"", "Uhrzeit", "Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag"
-				}
-			));
-			table.getColumnModel().getColumn(0).setPreferredWidth(22);
-			table.getColumnModel().getColumn(1).setPreferredWidth(130);
-			table.getColumnModel().getColumn(2).setPreferredWidth(80);
-			table.getColumnModel().getColumn(3).setPreferredWidth(100);
-			table.getColumnModel().getColumn(4).setPreferredWidth(110);
-			table.getColumnModel().getColumn(5).setPreferredWidth(90);
 			
 			
 			// ##################################################################
@@ -97,10 +72,6 @@ public class TimetableWindow extends JFrame {
             	//model.addRow(new Object[]{ obj.getString("name")});
             }*/
 			
-						
-			JScrollPane scrollPane = new JScrollPane(table);
-			panel.add(scrollPane);
-			
 			JPanel panel_1 = new JPanel();
 			tabbedPane.addTab("New tab", null, panel_1, null);
 			
@@ -116,7 +87,7 @@ public class TimetableWindow extends JFrame {
 					System.exit(0);
 				}
 			});
-			btnNewButton.setBounds(649, 321, 117, 25);
+			btnNewButton.setBounds(163, 246, 294, 25);
 			getContentPane().add(btnNewButton);
 			
 			JButton btnNewButton_1 = new JButton("Log Rooms, Teachers and Courses");
@@ -161,8 +132,53 @@ public class TimetableWindow extends JFrame {
 					}
 				}
 			});
-			btnNewButton_1.setBounds(585, 229, 304, 25);
+			btnNewButton_1.setBounds(153, 209, 304, 25);
 			getContentPane().add(btnNewButton_1);
+			
+			table = new JTable();
+			table.setBorder(new BevelBorder(BevelBorder.RAISED, null, null, null, null));
+			panel.add(table);
+			
+			table.setModel(new DefaultTableModel(
+				new Object[][] {
+					{"1", timeslot1.get("from") + " - " + timeslot1.get("until"), null, null, null, null, null},
+					{"2", timeslot2.get("from") + " - " + timeslot2.get("until"), null, null, null, null, null},
+					{"3", timeslot3.get("from") + " - " + timeslot3.get("until"), null, null, null, null, null},
+					{"4", timeslot4.get("from") + " - " + timeslot4.get("until"), null, null, null, null, null},
+					{"5", timeslot5.get("from") + " - " + timeslot5.get("until"), null, null, null, null, null},
+					{"6", timeslot6.get("from") + " - " + timeslot6.get("until"), null, null, null, null, null},
+					{"7", timeslot7.get("from") + " - " + timeslot7.get("until"), null, null, null, null, null},
+					{"8", timeslot8.get("from") + " - " + timeslot8.get("until"), null, null, null, null, null},
+					{"9", timeslot9.get("from") + " - " + timeslot9.get("until"), null, null, null, null, null},
+					{"10", timeslot10.get("from") + " - " + timeslot10.get("until"), null, null, null, null, null},
+				},
+				new String[] {
+					"", "Uhrzeit", "Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag"
+				}
+			));
+			table.getColumnModel().getColumn(0).setPreferredWidth(22);
+			table.getColumnModel().getColumn(1).setPreferredWidth(130);
+			table.getColumnModel().getColumn(2).setPreferredWidth(80);
+			table.getColumnModel().getColumn(3).setPreferredWidth(100);
+			table.getColumnModel().getColumn(4).setPreferredWidth(110);
+			table.getColumnModel().getColumn(5).setPreferredWidth(90);
+			
+			table.addMouseListener(new java.awt.event.MouseAdapter() {
+			    @Override
+			    public void mouseClicked(java.awt.event.MouseEvent evt) {
+			        int row = table.rowAtPoint(evt.getPoint());
+			        int col = table.columnAtPoint(evt.getPoint());
+			        if (row >= 0 && col >= 0) {
+			        	EditDialog dialog = new EditDialog((Frame) JFrame, false);
+			        	dialog.setSize(250, 120);
+			            dialog.setVisible(true);
+			        }
+			    }
+			});
+			
+			JScrollPane scrollPane = new JScrollPane(table);
+			scrollPane.setBounds(22, 12, 540, 185);
+			getContentPane().add(scrollPane);
 
 		}
 }

@@ -136,7 +136,7 @@ public class TimetableStart {
 		
 		// show the gui
 		TimetableWindow timetableWindow = new TimetableWindow("Stundenplan");
-		timetableWindow.setSize(800,400);
+		timetableWindow.setSize(600,350);
 		timetableWindow.setVisible(true);
 		
 		/**
