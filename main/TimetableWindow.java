@@ -95,10 +95,12 @@ public class TimetableWindow extends JFrame {
 				@SuppressWarnings("unchecked")
 				public void actionPerformed(ActionEvent e) {
 					
+					// preparing the names, times and filters for queries
 					String[] weekdayShortnames = new String[] { "Mo", "Di", "Mi", "Do", "Fr" };
 					String[] timeslotStarts = new String[] { "7:45", "8:30", "9:30", "10:15", "11:30", "12:15", "13:30", "14:15", "15:15", "16:00" };
 					String[] filters = new String[] { "room", "course", "teachers" };
 					
+					// get all the data for each day and timespan from the database
 					for(String weekdayShortname : weekdayShortnames) {
 						for (String timeslotStart : timeslotStarts) {
 							
@@ -107,6 +109,7 @@ public class TimetableWindow extends JFrame {
 							
 							DBCursor cursor = DatabaseQueries.findOneInCollectionAnd("timetable", "weekday", weekday, "timeslot", timeslot);
 							
+							// iterating over the resultset for timetable
 							String result = "";
 							while(cursor.hasNext()) {
 								DBObject element = cursor.next();
@@ -163,13 +166,16 @@ public class TimetableWindow extends JFrame {
 			table.getColumnModel().getColumn(4).setPreferredWidth(110);
 			table.getColumnModel().getColumn(5).setPreferredWidth(90);
 			
+			// make the content of the days' timeslot editable via dialog after click on cell
 			table.addMouseListener(new java.awt.event.MouseAdapter() {
 			    @Override
 			    public void mouseClicked(java.awt.event.MouseEvent evt) {
 			        int row = table.rowAtPoint(evt.getPoint());
 			        int col = table.columnAtPoint(evt.getPoint());
-			        if (row >= 0 && col >= 0) {
-			        	EditDialog dialog = new EditDialog((Frame) JFrame, false);
+			        if (row >= 0 && col >= 2) {
+			        	Object cellValue = table.getModel().getValueAt(row, col);
+			        	System.out.println(cellValue);
+			        	EditDialog dialog = new EditDialog((Frame) JFrame, cellValue);
 			        	dialog.setSize(250, 120);
 			            dialog.setVisible(true);
 			        }

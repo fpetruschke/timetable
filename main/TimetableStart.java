@@ -124,35 +124,16 @@ public class TimetableStart {
 		DatabaseQueries.insertIntoTimetable("Fr", "13:30", "221", "IT-WS", new String[] {"Hr"});
 		DatabaseQueries.insertIntoTimetable("Fr", "14:15", "221", "IT-WS", new String[] {"Hr"});
 		
+		// debugging output
 		DBCursor cursor = DatabaseQueries.showAllFromCollection("timetable");
 		while (cursor.hasNext()) { 
-			   System.out.println(cursor.next());
-			   /*String firstname = cursor.next().get("firstname");
-			   lab1.setText(firstname);*/
-				//BasicDBObject obj = (BasicDBObject) cursor.next();
-				//lab1.setText(obj.getString("firstname"));
-			    //result.add(obj.getString("HomeTown"));
-			}
+			System.out.println(cursor.next());
+		}
 		
 		// show the gui
 		TimetableWindow timetableWindow = new TimetableWindow("Stundenplan");
 		timetableWindow.setSize(600,350);
 		timetableWindow.setVisible(true);
-		
-		/**
-		 * Example: Create db connection, create collection, delete collection and drop db connection
-		 */
-		// connect to db
-		//DB db = DatabaseConntector.connectDb();
-		
-		// create a collection
-		//DBCollection newCollection = DatabaseQueries.createCollection(db, "test");
-		
-		// drop the collection
-		//DatabaseQueries.deleteCollection(newCollection);
-		
-		// close the db connection
-		//DatabaseConntector.closeConnection();
 		
 	}
 

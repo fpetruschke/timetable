@@ -13,6 +13,7 @@ import com.mongodb.DB;
  */
 public class DatabaseConnector {
 
+	// initialization and definition of connection params
 	private static String host = "localhost";
 	private static int port = 27017;
 	private static String databaseName = "test";
