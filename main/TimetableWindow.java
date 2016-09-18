@@ -1,6 +1,7 @@
 package main;
 
 import java.awt.Component;
+import java.awt.Dimension;
 import java.awt.Frame;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -12,7 +13,6 @@ import com.mongodb.BasicDBList;
 import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
 
-import javax.swing.table.DefaultTableModel;
 import javax.swing.border.BevelBorder;
 
 import org.bson.BasicBSONObject;
@@ -21,60 +21,59 @@ import org.bson.types.BasicBSONList;
 /**
  * class TimetableWindow
  * 
- * Configuration of the gui
+ * Configuration of the gui.
+ * Also holds the timetable model and the edit dialog.
  * 
  * @author f.petruschke
+ * @author d.lentz
  *
  */
 @SuppressWarnings("serial")
 public class TimetableWindow extends JFrame {
 	protected static final Component JFrame = null;
-	private final JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.TOP);
 	private JTable table;
 
-		//Konstruktor
+		//Construktor
 		public TimetableWindow(String t) throws Exception{
 
-			//Aufruf Basisklassenkonstruktor
+			// base class constructor
 			super(t);
+			// setting the title of the window
 			setTitle("Stundenplanverwaltung");
+			// initialization of the panes' layout
 			getContentPane().setLayout(null);
-			//tabbedPane.setBounds(99, 257, 468, 459);
+			// instantiating a jTable with the TimetableModel and setting options
+			table = new JTable(new TimetableModel());
 			
-			//getContentPane().add(tabbedPane);
+			table.setPreferredScrollableViewportSize(new Dimension(700, 600));
+			table.setFillsViewportHeight(true);
+			table.setDefaultRenderer(Lesson.class, new TimetableRenderer());
+			table.setRowHeight(60);
+			table.setBorder(new BevelBorder(BevelBorder.RAISED, null, null, null, null));
 			
-			JPanel panel = new JPanel();
-			//tabbedPane.addTab("Stundenplan", null, panel, null);
-						
-			DBObject timeslot1 = DatabaseQueries.findOneInCollection("timeslots", "from", "7:45");
-			DBObject timeslot2 = DatabaseQueries.findOneInCollection("timeslots", "from", "8:30");
-			DBObject timeslot3 = DatabaseQueries.findOneInCollection("timeslots", "from", "9:30");
-			DBObject timeslot4 = DatabaseQueries.findOneInCollection("timeslots", "from", "10:15");
-			DBObject timeslot5 = DatabaseQueries.findOneInCollection("timeslots", "from", "11:30");
-			DBObject timeslot6 = DatabaseQueries.findOneInCollection("timeslots", "from", "12:15");
-			DBObject timeslot7 = DatabaseQueries.findOneInCollection("timeslots", "from", "13:30");
-			DBObject timeslot8 = DatabaseQueries.findOneInCollection("timeslots", "from", "14:15");
-			DBObject timeslot9 = DatabaseQueries.findOneInCollection("timeslots", "from", "15:15");
-			DBObject timeslot10 = DatabaseQueries.findOneInCollection("timeslots", "from", "16:00");
+			// make the content of the days' timeslot editable via dialog after click on cell
+			table.addMouseListener(new java.awt.event.MouseAdapter() {
+			    @Override
+			    public void mouseClicked(java.awt.event.MouseEvent evt) {
+			        int row = table.rowAtPoint(evt.getPoint());
+			        int col = table.columnAtPoint(evt.getPoint());
+			        if (row >= 0 && col >= 1) {
+			        	//Object cellValue = table.getModel().getValueAt(row, col);
+			        	Lesson cellObject = (Lesson) table.getValueAt(row, col);
+			        	EditDialog dialog = new EditDialog((Frame) JFrame, cellObject);
+			        	dialog.setSize(450, 300);
+			            dialog.setVisible(true);
+			        }
+			    }
+			});
 			
+			//Create the scroll pane and add the table to it.
+			JScrollPane scrollPane = new JScrollPane();
+			scrollPane.setBounds(24, 12, 703, 622);
+			getContentPane().add(scrollPane);
+			scrollPane.setViewportView(table);
 			
-			// ##################################################################
-			// attempt to autofill the table
-			// ##################################################################
-			/*final DefaultTableModel model;
-			JTable table = new JTable(model = new DefaultTableModel(new Object[][]{},new Object[]{"_id", "weekday.name"}));
-	        getContentPane().add(new JScrollPane(table));
-
-	        DBCursor cursor = DatabaseQueries.showAllFromCollection("timeslots");
-            while (cursor.hasNext()) {
-            	model.addRow(new Object[]{cursor.next().toString()});
-            	//BasicDBObject obj = (BasicDBObject) cursor.next();
-            	//model.addRow(new Object[]{ obj.getString("name")});
-            }*/
-			
-			JPanel panel_1 = new JPanel();
-			tabbedPane.addTab("New tab", null, panel_1, null);
-			
+			// add button for exiting and closing the connection
 			JButton btnNewButton = new JButton("Beenden");
 			btnNewButton.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
@@ -87,9 +86,10 @@ public class TimetableWindow extends JFrame {
 					System.exit(0);
 				}
 			});
-			btnNewButton.setBounds(163, 246, 294, 25);
+			btnNewButton.setBounds(423, 638, 304, 25);
 			getContentPane().add(btnNewButton);
 			
+			// for debugging purposes
 			JButton btnNewButton_1 = new JButton("Log Rooms, Teachers and Courses");
 			btnNewButton_1.addActionListener(new ActionListener() {
 				@SuppressWarnings("unchecked")
@@ -135,56 +135,8 @@ public class TimetableWindow extends JFrame {
 					}
 				}
 			});
-			btnNewButton_1.setBounds(153, 209, 304, 25);
+			btnNewButton_1.setBounds(24, 638, 304, 25);
 			getContentPane().add(btnNewButton_1);
-			
-			table = new JTable();
-			table.setBorder(new BevelBorder(BevelBorder.RAISED, null, null, null, null));
-			panel.add(table);
-			
-			table.setModel(new DefaultTableModel(
-				new Object[][] {
-					{"1", timeslot1.get("from") + " - " + timeslot1.get("until"), null, null, null, null, null},
-					{"2", timeslot2.get("from") + " - " + timeslot2.get("until"), null, null, null, null, null},
-					{"3", timeslot3.get("from") + " - " + timeslot3.get("until"), null, null, null, null, null},
-					{"4", timeslot4.get("from") + " - " + timeslot4.get("until"), null, null, null, null, null},
-					{"5", timeslot5.get("from") + " - " + timeslot5.get("until"), null, null, null, null, null},
-					{"6", timeslot6.get("from") + " - " + timeslot6.get("until"), null, null, null, null, null},
-					{"7", timeslot7.get("from") + " - " + timeslot7.get("until"), null, null, null, null, null},
-					{"8", timeslot8.get("from") + " - " + timeslot8.get("until"), null, null, null, null, null},
-					{"9", timeslot9.get("from") + " - " + timeslot9.get("until"), null, null, null, null, null},
-					{"10", timeslot10.get("from") + " - " + timeslot10.get("until"), null, null, null, null, null},
-				},
-				new String[] {
-					"", "Uhrzeit", "Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag"
-				}
-			));
-			table.getColumnModel().getColumn(0).setPreferredWidth(22);
-			table.getColumnModel().getColumn(1).setPreferredWidth(130);
-			table.getColumnModel().getColumn(2).setPreferredWidth(80);
-			table.getColumnModel().getColumn(3).setPreferredWidth(100);
-			table.getColumnModel().getColumn(4).setPreferredWidth(110);
-			table.getColumnModel().getColumn(5).setPreferredWidth(90);
-			
-			// make the content of the days' timeslot editable via dialog after click on cell
-			table.addMouseListener(new java.awt.event.MouseAdapter() {
-			    @Override
-			    public void mouseClicked(java.awt.event.MouseEvent evt) {
-			        int row = table.rowAtPoint(evt.getPoint());
-			        int col = table.columnAtPoint(evt.getPoint());
-			        if (row >= 0 && col >= 2) {
-			        	Object cellValue = table.getModel().getValueAt(row, col);
-			        	System.out.println(cellValue);
-			        	EditDialog dialog = new EditDialog((Frame) JFrame, cellValue);
-			        	dialog.setSize(250, 120);
-			            dialog.setVisible(true);
-			        }
-			    }
-			});
-			
-			JScrollPane scrollPane = new JScrollPane(table);
-			scrollPane.setBounds(22, 12, 540, 185);
-			getContentPane().add(scrollPane);
 
 		}
 }

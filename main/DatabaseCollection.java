@@ -24,10 +24,10 @@ public class DatabaseCollection {
 	public static DBCollection createCollection(String collectionName) throws Exception {
 		try {
 			DBCollection coll = DatabaseConnector.db.getCollection(collectionName);
-			System.out.println("Collection "+collectionName+" successfully created");
+			System.out.println("[SUCCESS] Successfully created collection "+collectionName);
 			return coll;
 		} catch (Exception e) {
-			System.err.println( e.getClass().getName() + ": " + e.getMessage() );
+			System.err.println( "[ERROR] " + e.getClass().getName() + ": " + e.getMessage() );
 	    	throw new Exception();
 		}
 	}
@@ -43,9 +43,9 @@ public class DatabaseCollection {
 	public static void deleteCollection(DBCollection collectionToDelete) throws Exception {
 		try {
 			collectionToDelete.drop();
-			System.out.println("Collection "+collectionToDelete.getName()+" was dropped");
+			System.out.println("[SUCCESS] Dropped collection "+collectionToDelete.getName());
 		} catch (Exception e) {
-			System.err.println( e.getClass().getName() + ": " + e.getMessage() );
+			System.err.println( "[ERROR] " + e.getClass().getName() + ": " + e.getMessage() );
 	    	throw new Exception();
 		}
 	}

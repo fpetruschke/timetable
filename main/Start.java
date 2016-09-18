@@ -5,17 +5,24 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import com.mongodb.DBCursor;
 
 /**
- * class TimetableStart
+ * class Start
  * 
- * This class starts the program
+ * This class starts the program.
+ * 
+ * Important: An acitve mongoDB setup is necessary for this program to run!
+ * 
+ * When starting the program, the mongoDB collections will be initialized/filled.
+ * Before that happens, all existing data from the set collections will be deleted.
+ * This is done for maintining and developing purposes but also for presenting the
+ * functionality of the project.
  * 
  * @author f.petruschke
+ * @author d.lentz
  *
  */
-public class TimetableStart {
+public class Start {
 
 	/**
 	 * @param args
@@ -41,7 +48,25 @@ public class TimetableStart {
 		weekdays.put("Donnerstag", "Do");
 		weekdays.put("Freitag", "Fr");
 		for(Entry<String,String> weekday : weekdays.entrySet()){
-			DatabaseQueries.insertWeekday(weekday.getKey(), weekday.getValue());
+			int nameId = 0;
+			switch(weekday.getValue()) {
+				case("Mo"):
+					nameId = 1;
+					break;
+				case("Di"):
+					nameId = 2;
+					break;
+				case("Mi"):
+					nameId = 3;
+					break;
+				case("Do"):
+					nameId = 4;
+					break;
+				case("Fr"):
+					nameId = 5;
+					break;
+			}
+			DatabaseQueries.insertWeekday(nameId, weekday.getKey(), weekday.getValue());
 	    }
 		
 		// creating the collection timeslots (deleting it first for janitoring)
@@ -58,8 +83,42 @@ public class TimetableStart {
 		timeslots.put("14:15", "15:00");
 		timeslots.put("15:15", "16:00");
 		timeslots.put("16:00", "16:45");
+		
 		for(Entry<String,String> timeslot : timeslots.entrySet()){
-			DatabaseQueries.insertTimeslot(timeslot.getKey(), timeslot.getValue());
+			int hourId = 0;
+			switch(timeslot.getKey()) {
+				case("7:45"):
+					hourId = 1;
+					break;
+				case("8:30"):
+					hourId = 2;
+					break;
+				case("9:30"):
+					hourId = 3;
+					break;
+				case("10:15"):
+					hourId = 4;
+					break;
+				case("11:30"):
+					hourId = 5;
+					break;
+				case("12:15"):
+					hourId = 6;
+					break;
+				case("13:30"):
+					hourId = 7;
+					break;
+				case("14:15"):
+					hourId = 8;
+					break;
+				case("15:15"):
+					hourId = 9;
+					break;
+				case("16:00"):
+					hourId = 10;
+					break;
+			}
+			DatabaseQueries.insertTimeslot(hourId, timeslot.getKey(), timeslot.getValue());
 	    }
 		
 		// creating the collection rooms (deleting it first for janitoring)
@@ -124,15 +183,15 @@ public class TimetableStart {
 		DatabaseQueries.insertIntoTimetable("Fr", "13:30", "221", "IT-WS", new String[] {"Hr"});
 		DatabaseQueries.insertIntoTimetable("Fr", "14:15", "221", "IT-WS", new String[] {"Hr"});
 		
-		// debugging output
-		DBCursor cursor = DatabaseQueries.showAllFromCollection("timetable");
-		while (cursor.hasNext()) { 
-			System.out.println(cursor.next());
-		}
+		// debugging output - decomment if necessary - IMPORTANT: Import DBCursor!
+		//DBCursor cursor = DatabaseQueries.showAllFromCollection("timetable");
+		//while (cursor.hasNext()) { 
+		//	System.out.println(cursor.next());
+		//}
 		
 		// show the gui
 		TimetableWindow timetableWindow = new TimetableWindow("Stundenplan");
-		timetableWindow.setSize(600,350);
+		timetableWindow.setSize(750,700);
 		timetableWindow.setVisible(true);
 		
 	}

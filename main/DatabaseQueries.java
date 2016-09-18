@@ -27,32 +27,26 @@ public class DatabaseQueries {
 	 * 
 	 * Inserts a new weekday into the collection "weekdays"
 	 * 
+	 * @param nameId		id of the weekdayname
 	 * @param name			name of the weekday (e.g. "Montag")
 	 * @param shortname		shortname of the weekday (e.g. "Mo")
 	 * @return				returns true on success
 	 * @throws Exception	throws exception if inserting failed
 	 */
-	public static boolean insertWeekday(String name, String shortname) throws Exception {
+	public static boolean insertWeekday(int nameId, String name, String shortname) throws Exception {
 		
 		DBCollection collection = DatabaseConnector.db.getCollection("weekdays");
 		
 		try {
 			BasicDBObject document = new BasicDBObject();
+			document.put("nameId", Integer.toString(nameId));
 			document.put("name", name);
 			document.put("shortname", shortname);
-
-			/*BasicDBObject documentDetail = new BasicDBObject();
-			documentDetail.put("street", street);
-			documentDetail.put("zipCode", zipCode);
-			documentDetail.put("city", city);
-			document.put("detail", documentDetail);*/
-
 			collection.insert(document);
-			
 			return true;
 			
 		} catch (Exception e) {
-			System.out.println("ERROR: " + e.getMessage() + "STACKTRACE: " + e.getStackTrace());
+			System.out.println("[ERROR] " + e.getMessage() + "STACKTRACE: " + e.getStackTrace());
 			throw e;
 		}
 	}
@@ -62,25 +56,26 @@ public class DatabaseQueries {
 	 * 
 	 * inserts new timeslot into collection "timeslots"
 	 * 
+	 * @param hourId		id of the hour - e.g. 1 for a course from 7:45 - 8:30
 	 * @param from			starttime - e.g. "7:45"
 	 * @param until			endtime - e.g. "8:30"
 	 * @return				returns true on success
 	 * @throws Exception 	throws exception if insertion fails
 	 */
-	public static boolean insertTimeslot(String from, String until) throws Exception {
+	public static boolean insertTimeslot(int hourId, String from, String until) throws Exception {
 		
 		DBCollection collection = DatabaseConnector.db.getCollection("timeslots");
 		
 		try {
 			BasicDBObject document = new BasicDBObject();
+			document.put("hourId", Integer.toString(hourId));
 			document.put("from", from);
 			document.put("until", until);
 			collection.insert(document);
-			
 			return true;
 			
 		} catch (Exception e) {
-			System.out.println("ERROR: " + e.getMessage() + "STACKTRACE: " + e.getStackTrace());
+			System.out.println("[ERROR] " + e.getMessage() + "STACKTRACE: " + e.getStackTrace());
 			throw e;
 		}
 	}
@@ -102,11 +97,10 @@ public class DatabaseQueries {
 			BasicDBObject document = new BasicDBObject();
 			document.put("name", name);
 			collection.insert(document);
-			
 			return true;
 			
 		} catch (Exception e) {
-			System.out.println("ERROR: " + e.getMessage() + "STACKTRACE: " + e.getStackTrace());
+			System.out.println("[ERROR] " + e.getMessage() + "STACKTRACE: " + e.getStackTrace());
 			throw e;
 		}
 	}
@@ -128,11 +122,10 @@ public class DatabaseQueries {
 			BasicDBObject document = new BasicDBObject();
 			document.put("name", name);
 			collection.insert(document);
-			
 			return true;
 			
 		} catch (Exception e) {
-			System.out.println("ERROR: " + e.getMessage() + "STACKTRACE: " + e.getStackTrace());
+			System.out.println("[ERROR] " + e.getMessage() + "STACKTRACE: " + e.getStackTrace());
 			throw e;
 		}
 	}
@@ -154,11 +147,10 @@ public class DatabaseQueries {
 			BasicDBObject document = new BasicDBObject();
 			document.put("name", name);
 			collection.insert(document);
-			
 			return true;
 			
 		} catch (Exception e) {
-			System.out.println("ERROR: " + e.getMessage() + "STACKTRACE: " + e.getStackTrace());
+			System.out.println("[ERROR] " + e.getMessage() + "STACKTRACE: " + e.getStackTrace());
 			throw e;
 		}
 	}
@@ -262,11 +254,10 @@ public class DatabaseQueries {
 			}
 			document.append("teachers", dbl);
 			collection.insert(document);
-			
 			return true;
 			
 		} catch (Exception e) {
-			System.out.println("ERROR: " + e.getMessage() + "STACKTRACE: " + e.getStackTrace());
+			System.out.println("[ERROR] " + e.getMessage() + "STACKTRACE: " + e.getStackTrace());
 			throw e;
 		}
 	}
@@ -290,11 +281,10 @@ public class DatabaseQueries {
 		    query.put("_id", new ObjectId(idOfDocument));
 		    DBObject dbObj = collection.findOne(query);
 			collection.remove(dbObj);
-			
 			return true;
 			
 		} catch (Exception e) {
-			System.out.println("ERROR: " + e.getMessage() + "STACKTRACE: " + e.getStackTrace());
+			System.out.println("[ERROR] " + e.getMessage() + "STACKTRACE: " + e.getStackTrace());
 			throw e;
 		}
 		

@@ -38,12 +38,11 @@ public class DatabaseConnector {
 			// Now connect to your databases
 			@SuppressWarnings("deprecation")
 			DB openedDb = mongoClient.getDB(databaseName);
-			System.out.println("Connection to database successfully");
- 
+			System.out.println("[SUCCESS] Successfully connectied to the database.");
 			db = openedDb;
 			
       } catch(Exception e) {
-    	  System.err.println( e.getClass().getName() + ": " + e.getMessage() );
+    	  System.err.println( "[ERROR]" + e.getClass().getName() + ": " + e.getMessage() );
     	  throw new Exception();
       }
 	}
@@ -59,9 +58,9 @@ public class DatabaseConnector {
 	public static void closeConnection() throws Exception {
 		try {
 			mongoClient.close();
-			System.out.println("Connection to database closed");
+			System.out.println("[SUCCESS] Successfully closed the connection to the database.");
 		} catch(Exception e) {
-			System.err.println( e.getClass().getName() + ": " + e.getMessage() );
+			System.err.println( "[ERROR]" + e.getClass().getName() + ": " + e.getMessage() );
 			throw new Exception();
 		}
 	}

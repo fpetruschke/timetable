@@ -13,7 +13,7 @@ Daniel: -- folgt --
 # Stammdaten
 
 Die Stammdaten (Collection und Documents) werden beim Starten der Anwendung erzeugt.  
-Bestehende Stammdaten werden allerdings zuvor gelöscht, damit keine Duplikate entstehen.  
+Bestehende Stammdaten werden **allerdings zuvor gelöscht**, damit keine Duplikate entstehen.  
 
 # Vokabular
 
@@ -69,9 +69,9 @@ Das ist mit NoSQL nicht möglich.
 # Arbeitsschritte
 
 - [x] Aufbau der Projektstruktur mit Trennung von Controllern und Gui  
-- [ ] [WIP] Erstellen des GUIs  
+- [X] Erstellen des GUIs (Anzeige und Ändern von Daten)  
 - [x] Installation von mongoDB  
 - [x] Herstellen einer Verbindung zum lokalen mongoDB server  
 - [x] Erstellen erster Standard-Abfragen (Select, insert, delete)  
-- [ ] [WIP] Erstellen einer Tabelle, die mit Daten aus der mongoDB gespeist wird  
+- [X] Erstellen einer Tabelle, die mit Daten aus der mongoDB gespeist wird  
 - [ ] Erstellen von CRUD-Funktionalität im GUI  
