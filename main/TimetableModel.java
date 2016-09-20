@@ -21,7 +21,7 @@ import com.mongodb.DBObject;
  *
  */
 public class TimetableModel extends AbstractTableModel{
-	Lesson[][] lesson;
+	public static Entry[][] entry;
 	String[] columnNames;
 	
 	@SuppressWarnings("unchecked")
@@ -38,7 +38,7 @@ public class TimetableModel extends AbstractTableModel{
 		// defining the data for the jTable
 		int rows = 10;
 		int columns = 6;
-		Lesson[][] data = new Lesson [rows][columns];
+		entry = new Entry [rows][columns];
 		
 		for(int row = 0; row < rows; row++) {			
 			for(int column = 0; column < columns; column++) {
@@ -46,18 +46,18 @@ public class TimetableModel extends AbstractTableModel{
 				// if first column: show time from and until
 				if(column == 0) {
 					// insert from time to until time
-					DBObject hour = DatabaseQueries.findOneInCollection("timeslots", "hourId", Integer.toString(row+1));
+					DBObject hour = MongoDbQueries.findOneInCollection("timeslots", "hourId", Integer.toString(row+1));
 					String from = (String) ((BasicBSONObject) hour).get("from");
 					String until = (String) ((BasicBSONObject) hour).get("until");
-					data[row][column] = new Lesson(from,"-",until);
+					entry[row][column] = new Entry(from, until);
 					
 				// else get the corresponding data
 				} else {
 					
 					// get the timetable column corresponding to weekday and course hour
-					DBObject weekday = DatabaseQueries.findOneInCollection("weekdays", "nameId", Integer.toString(column));
-					DBObject hourId = DatabaseQueries.findOneInCollection("timeslots", "hourId", Integer.toString(row+1));
-					DBCursor timetableColumn = DatabaseQueries.findOneInCollectionAnd("timetable", "weekday", weekday, "timeslot", hourId);
+					DBObject weekday = MongoDbQueries.findOneInCollection("weekdays", "nameId", Integer.toString(column));
+					DBObject hourId = MongoDbQueries.findOneInCollection("timeslots", "hourId", Integer.toString(row+1));
+					DBCursor timetableColumn = MongoDbQueries.findOneInCollectionAnd("timetable", "weekday", weekday, "timeslot", hourId);
 					
 					// check if data as available or if its an empty hour
 					if(timetableColumn!=null && timetableColumn.count()>0) {
@@ -66,17 +66,17 @@ public class TimetableModel extends AbstractTableModel{
 							
 							// get all the teachers names and concatinate them to one string
 							Object teachers = hourObject.get("teachers");
-							String teacherNames = "";
+							ArrayList<String> teacherNames = new ArrayList<>();
 							if(teachers instanceof BasicDBList) {
 								for (int i = 0; i < ((ArrayList<Object>) teachers).size(); i++) {
 									Object listElement = ((BasicBSONList) teachers).get(i);
 									Object teacher = ((BasicBSONObject) listElement).get("teacher");
 									String teacherName = (String) ((BasicBSONObject) teacher).get("name"); 
-									teacherNames += teacherName + " ";
+									teacherNames.add(teacherName);
 								}
 							} else {
 								String name = (String) ((BasicBSONObject) teachers).get("name");
-								teacherNames += name + ", ";
+								teacherNames.add(name);
 							}
 							
 							// get the course name
@@ -88,22 +88,21 @@ public class TimetableModel extends AbstractTableModel{
 							String roomName = (String) ((BasicBSONObject) room).get("name");
 							
 							// insert the result data
-							data[row][column] = new Lesson(teacherNames, roomName, courseName);
+							entry[row][column] = new Entry((String) weekday.get("shortname"), (String) hourId.get("from"),teacherNames, roomName, courseName);
 						}
 					} else {
 						// no data was found for that day at that time block
-						data[row][column] = new Lesson(false);
+						entry[row][column] = new Entry(false);
 					}
 				}
 			}
 		}
 		
-		this.lesson = data;
 		this.columnNames = columnNames;
 	}
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public Class getColumnClass(int columnIndex) {
-		return Lesson.class;
+		return Entry.class;
 	}
 	@Override
 	public int getColumnCount() {
@@ -112,12 +111,12 @@ public class TimetableModel extends AbstractTableModel{
 
 	@Override
 	public Object getValueAt(int rowIndex, int columnIndex) {
-		return lesson[rowIndex][columnIndex];
+		return TimetableModel.entry[rowIndex][columnIndex];
 	}
 
-	public void setValueAt(String teacher, String room, String subject, int rowIndex, int columnIndex) {
-		Lesson newLesson = lesson[rowIndex][columnIndex];
-		newLesson.setTeacher(teacher);
+	public void setValueAt(ArrayList<String> teacherNames, String room, String subject, int rowIndex, int columnIndex) {
+		Entry newLesson = entry[rowIndex][columnIndex];
+		newLesson.setTeacher(teacherNames);
 		newLesson.setRoom(room);
 		newLesson.setSubject(subject);
 		// refresh the table
@@ -126,11 +125,16 @@ public class TimetableModel extends AbstractTableModel{
 	
 	@Override
 	public int getRowCount() {
-		return lesson.length;
+		return entry.length;
 	}
 	
 	public String getColumnName(int columnIndex) {
 		return columnNames[columnIndex];
+	}
+	
+	public static void refreshTable() {
+		TimetableModel table = new TimetableModel();
+		table.fireTableDataChanged();
 	}
 
 }

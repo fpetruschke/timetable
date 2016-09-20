@@ -31,16 +31,17 @@ public class Start {
 	public static void main(String[] args) throws Exception {
 		
 		
+		
 		// turning of the unnessecary loggin into console
 		Logger mongoLogger = Logger.getLogger( "org.mongodb.driver" );
 		mongoLogger.setLevel(Level.SEVERE); 
 		
 		// initializing the db connection
-		new DatabaseConnector();
+		new MongoDbConnector();
 		
 		// creating the collection weekdays (deleting it first for janitoring)
-		DatabaseCollection.deleteCollection(DatabaseConnector.db.getCollection("weekdays"));
-		DatabaseCollection.createCollection("weekdays");
+		MongoDbCollection.deleteCollection(MongoDbConnector.db.getCollection("weekdays"));
+		MongoDbCollection.createCollection("weekdays");
 		Map<String, String> weekdays = new HashMap<>();
 		weekdays.put("Montag", "Mo");
 		weekdays.put("Dienstag", "Di");
@@ -66,12 +67,12 @@ public class Start {
 					nameId = 5;
 					break;
 			}
-			DatabaseQueries.insertWeekday(nameId, weekday.getKey(), weekday.getValue());
+			MongoDbQueries.insertWeekday(nameId, weekday.getKey(), weekday.getValue());
 	    }
 		
 		// creating the collection timeslots (deleting it first for janitoring)
-		DatabaseCollection.deleteCollection(DatabaseConnector.db.getCollection("timeslots"));
-		DatabaseCollection.createCollection("timeslots");
+		MongoDbCollection.deleteCollection(MongoDbConnector.db.getCollection("timeslots"));
+		MongoDbCollection.createCollection("timeslots");
 		Map<String, String> timeslots = new HashMap<>();
 		timeslots.put("7:45", "8:30");
 		timeslots.put("8:30", "9:15");
@@ -118,81 +119,101 @@ public class Start {
 					hourId = 10;
 					break;
 			}
-			DatabaseQueries.insertTimeslot(hourId, timeslot.getKey(), timeslot.getValue());
+			MongoDbQueries.insertTimeslot(hourId, timeslot.getKey(), timeslot.getValue());
 	    }
 		
 		// creating the collection rooms (deleting it first for janitoring)
-		DatabaseCollection.deleteCollection(DatabaseConnector.db.getCollection("rooms"));
-		DatabaseCollection.createCollection("rooms");
-		String[] rooms = new String[] {"221", "208", "H1.1"};
+		MongoDbCollection.deleteCollection(MongoDbConnector.db.getCollection("rooms"));
+		MongoDbCollection.createCollection("rooms");
+		String[] rooms = new String[] {"", "221", "208", "H1.1"};
 		for(String room : rooms){
-			DatabaseQueries.insertRoom(room);
+			MongoDbQueries.insertRoom(room);
 	    }
 		
 		// creating the collection courses (deleting it first for janitoring)
-		DatabaseCollection.deleteCollection(DatabaseConnector.db.getCollection("courses"));
-		DatabaseCollection.createCollection("courses");
-		String[] courses = new String[] {"AE", "IT", "SKIL", "GUS", "SUK", "OGP", "WUG", "IT-WS"};
+		MongoDbCollection.deleteCollection(MongoDbConnector.db.getCollection("courses"));
+		MongoDbCollection.createCollection("courses");
+		String[] courses = new String[] {"", "AE", "IT", "SKIL", "GUS", "SUK", "OGP", "WUG", "IT-WS"};
 		for(String course : courses){
-			DatabaseQueries.insertCourse(course);
+			MongoDbQueries.insertCourse(course);
 	    }
 		
 		// creating the collection teachers (deleting it first for janitoring)
-		DatabaseCollection.deleteCollection(DatabaseConnector.db.getCollection("teachers"));
-		DatabaseCollection.createCollection("teachers");
-		String[] teachers = new String[] {"Wm", "Hr", "Zi", "l1", "Al", "Rt", "Hu"};
+		MongoDbCollection.deleteCollection(MongoDbConnector.db.getCollection("teachers"));
+		MongoDbCollection.createCollection("teachers");
+		String[] teachers = new String[] {"", "Wm", "Hr", "Zi", "l1", "Al", "Rt", "Hu"};
 		for(String teacher : teachers){
-			DatabaseQueries.insertTeacher(teacher);
+			MongoDbQueries.insertTeacher(teacher);
 	    }
 		
 		// creating the collection timetable (deleting it first for janitoring)
-		DatabaseCollection.deleteCollection(DatabaseConnector.db.getCollection("timetable"));
-		DatabaseCollection.createCollection("timetable");
-		DatabaseQueries.insertIntoTimetable("Mo", "9:30", "221", "AE", new String[] {"Wm"});
-		DatabaseQueries.insertIntoTimetable("Mo", "10:15", "221", "AE", new String[] {"Wm"});
-		DatabaseQueries.insertIntoTimetable("Mo", "11:30", "221", "AE", new String[] {"Wm"});
-		DatabaseQueries.insertIntoTimetable("Mo", "12:15", "221", "AE", new String[] {"Wm"});
-		DatabaseQueries.insertIntoTimetable("Mo", "13:30", "221", "AE", new String[] {"Wm"});
-		DatabaseQueries.insertIntoTimetable("Mo", "14:15", "221", "AE", new String[] {"Wm"});
+		MongoDbCollection.deleteCollection(MongoDbConnector.db.getCollection("timetable"));
+		MongoDbCollection.createCollection("timetable");
+		MongoDbQueries.insertIntoTimetable("Mo", "7:45", "", "", new String[] {});
+		MongoDbQueries.insertIntoTimetable("Mo", "8:30", "", "", new String[] {});
+		MongoDbQueries.insertIntoTimetable("Mo", "9:30", "221", "AE", new String[] {"Wm"});
+		MongoDbQueries.insertIntoTimetable("Mo", "10:15", "221", "AE", new String[] {"Wm"});
+		MongoDbQueries.insertIntoTimetable("Mo", "11:30", "221", "AE", new String[] {"Wm"});
+		MongoDbQueries.insertIntoTimetable("Mo", "12:15", "221", "AE", new String[] {"Wm"});
+		MongoDbQueries.insertIntoTimetable("Mo", "13:30", "221", "AE", new String[] {"Wm"});
+		MongoDbQueries.insertIntoTimetable("Mo", "14:15", "221", "AE", new String[] {"Wm"});
+		MongoDbQueries.insertIntoTimetable("Mo", "15:15", "", "", new String[] {});
+		MongoDbQueries.insertIntoTimetable("Mo", "16:00", "", "", new String[] {});
 		
-		DatabaseQueries.insertIntoTimetable("Di", "8:30", "208", "IT", new String[] {"Hr"});
-		DatabaseQueries.insertIntoTimetable("Di", "9:30", "208", "IT", new String[] {"Hr", "Zi"});
-		DatabaseQueries.insertIntoTimetable("Di", "10:15", "208", "IT", new String[] {"Hr", "Zi"});
-		DatabaseQueries.insertIntoTimetable("Di", "11:30", "208", "IT", new String[] {"l1"});
-		DatabaseQueries.insertIntoTimetable("Di", "12:15", "208", "IT", new String[] {"l1"});
-		DatabaseQueries.insertIntoTimetable("Di", "13:30", "208", "IT", new String[] {"Zi"});
-		DatabaseQueries.insertIntoTimetable("Di", "14:15", "208", "IT", new String[] {"Zi"});
-		DatabaseQueries.insertIntoTimetable("Di", "15:15", "208", "IT", new String[] {"Zi"});
+		MongoDbQueries.insertIntoTimetable("Di", "7:45", "", "", new String[] {});
+		MongoDbQueries.insertIntoTimetable("Di", "8:30", "208", "IT", new String[] {"Hr"});
+		MongoDbQueries.insertIntoTimetable("Di", "9:30", "208", "IT", new String[] {"Hr", "Zi"});
+		MongoDbQueries.insertIntoTimetable("Di", "10:15", "208", "IT", new String[] {"Hr", "Zi"});
+		MongoDbQueries.insertIntoTimetable("Di", "11:30", "208", "IT", new String[] {"l1"});
+		MongoDbQueries.insertIntoTimetable("Di", "12:15", "208", "IT", new String[] {"l1"});
+		MongoDbQueries.insertIntoTimetable("Di", "13:30", "208", "IT", new String[] {"Zi"});
+		MongoDbQueries.insertIntoTimetable("Di", "14:15", "208", "IT", new String[] {"Zi"});
+		MongoDbQueries.insertIntoTimetable("Di", "15:15", "208", "IT", new String[] {"Zi"});
+		MongoDbQueries.insertIntoTimetable("Di", "16:00", "", "", new String[] {});
 		
-		DatabaseQueries.insertIntoTimetable("Mi", "9:30", "H1.1", "GUS", new String[] {"Zi"});
-		DatabaseQueries.insertIntoTimetable("Mi", "10:15", "H1.1", "GUS", new String[] {"Zi"});
-		DatabaseQueries.insertIntoTimetable("Mi", "11:30", "221", "SUK", new String[] {"Al"});
+		MongoDbQueries.insertIntoTimetable("Mi", "7:45", "", "", new String[] {});
+		MongoDbQueries.insertIntoTimetable("Mi", "8:30", "", "", new String[] {});
+		MongoDbQueries.insertIntoTimetable("Mi", "9:30", "H1.1", "GUS", new String[] {"Zi"});
+		MongoDbQueries.insertIntoTimetable("Mi", "10:15", "H1.1", "GUS", new String[] {"Zi"});
+		MongoDbQueries.insertIntoTimetable("Mi", "11:30", "221", "SUK", new String[] {"Al"});
+		MongoDbQueries.insertIntoTimetable("Mi", "12:15", "", "", new String[] {});
+		MongoDbQueries.insertIntoTimetable("Mi", "13:30", "", "", new String[] {});
+		MongoDbQueries.insertIntoTimetable("Mi", "14:15", "", "", new String[] {});
+		MongoDbQueries.insertIntoTimetable("Mi", "15:15", "", "", new String[] {});
+		MongoDbQueries.insertIntoTimetable("Mi", "16:00", "", "", new String[] {});
 		
-		DatabaseQueries.insertIntoTimetable("Do", "9:30", "221", "OGP", new String[] {"Rt", "Hr"});
-		DatabaseQueries.insertIntoTimetable("Do", "10:15", "221", "OGP", new String[] {"Rt", "Hr"});
-		DatabaseQueries.insertIntoTimetable("Do", "11:30", "221", "OGP", new String[] {"Rt"});
-		DatabaseQueries.insertIntoTimetable("Do", "12:15", "221", "OGP", new String[] {"Rt"});
-		DatabaseQueries.insertIntoTimetable("Do", "13:30", "221", "WUG", new String[] {"Hu"});
-		DatabaseQueries.insertIntoTimetable("Do", "14:15", "221", "WUG", new String[] {"Hu"});
-		DatabaseQueries.insertIntoTimetable("Do", "15:15", "221", "WUG", new String[] {"Hu"});
-		DatabaseQueries.insertIntoTimetable("Do", "16:00", "221", "WUG", new String[] {"Hu"});
+		MongoDbQueries.insertIntoTimetable("Do", "7:45", "", "", new String[] {});
+		MongoDbQueries.insertIntoTimetable("Do", "8:30", "", "", new String[] {});
+		MongoDbQueries.insertIntoTimetable("Do", "9:30", "221", "OGP", new String[] {"Rt", "Hr"});
+		MongoDbQueries.insertIntoTimetable("Do", "10:15", "221", "OGP", new String[] {"Rt", "Hr"});
+		MongoDbQueries.insertIntoTimetable("Do", "11:30", "221", "OGP", new String[] {"Rt"});
+		MongoDbQueries.insertIntoTimetable("Do", "12:15", "221", "OGP", new String[] {"Rt"});
+		MongoDbQueries.insertIntoTimetable("Do", "13:30", "221", "WUG", new String[] {"Hu"});
+		MongoDbQueries.insertIntoTimetable("Do", "14:15", "221", "WUG", new String[] {"Hu"});
+		MongoDbQueries.insertIntoTimetable("Do", "15:15", "221", "WUG", new String[] {"Hu"});
+		MongoDbQueries.insertIntoTimetable("Do", "16:00", "221", "WUG", new String[] {"Hu"});
 		
-		DatabaseQueries.insertIntoTimetable("Fr", "10:15", "221", "GUS", new String[] {"Zi"});
-		DatabaseQueries.insertIntoTimetable("Fr", "11:30", "221", "IT-WS", new String[] {"Hr"});
-		DatabaseQueries.insertIntoTimetable("Fr", "12:15", "221", "IT-WS", new String[] {"Hr"});
-		DatabaseQueries.insertIntoTimetable("Fr", "13:30", "221", "IT-WS", new String[] {"Hr"});
-		DatabaseQueries.insertIntoTimetable("Fr", "14:15", "221", "IT-WS", new String[] {"Hr"});
+		MongoDbQueries.insertIntoTimetable("Fr", "7:45", "", "", new String[] {});
+		MongoDbQueries.insertIntoTimetable("Fr", "8:30", "", "", new String[] {});
+		MongoDbQueries.insertIntoTimetable("Fr", "9:30", "", "", new String[] {});
+		MongoDbQueries.insertIntoTimetable("Fr", "10:15", "221", "GUS", new String[] {"Zi"});
+		MongoDbQueries.insertIntoTimetable("Fr", "11:30", "221", "IT-WS", new String[] {"Hr"});
+		MongoDbQueries.insertIntoTimetable("Fr", "12:15", "221", "IT-WS", new String[] {"Hr"});
+		MongoDbQueries.insertIntoTimetable("Fr", "13:30", "221", "IT-WS", new String[] {"Hr"});
+		MongoDbQueries.insertIntoTimetable("Fr", "14:15", "221", "IT-WS", new String[] {"Hr"});
+		MongoDbQueries.insertIntoTimetable("Fr", "15:15", "", "", new String[] {});
+		MongoDbQueries.insertIntoTimetable("Fr", "16:00", "", "", new String[] {});
 		
 		// debugging output - decomment if necessary - IMPORTANT: Import DBCursor!
-		//DBCursor cursor = DatabaseQueries.showAllFromCollection("timetable");
+		//DBCursor cursor = MongoDbQueries.showAllFromCollection("timetable");
 		//while (cursor.hasNext()) { 
 		//	System.out.println(cursor.next());
 		//}
 		
 		// show the gui
-		TimetableWindow timetableWindow = new TimetableWindow("Stundenplan");
-		timetableWindow.setSize(750,700);
-		timetableWindow.setVisible(true);
+		MainFrame mainFrame = new MainFrame("Stundenplan");
+		mainFrame.setSize(750,700);
+		mainFrame.setVisible(true);
 		
 	}
 

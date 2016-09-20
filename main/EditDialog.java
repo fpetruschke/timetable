@@ -9,6 +9,7 @@ import javax.swing.JLabel;
 
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import java.util.ArrayList;
 
 import javax.swing.JComboBox;
 import javax.swing.DefaultComboBoxModel;
@@ -20,7 +21,7 @@ import javax.swing.JScrollPane;
 /**
  * class EditDialog
  * 
- * Dialog for editing JTable cell values.
+ * Dialog for editing JTable entries.
  * Opens onclick event.
  * 
  * @author f.petruschke
@@ -28,59 +29,85 @@ import javax.swing.JScrollPane;
 public class EditDialog extends JDialog {
 	
 	/**
-	 * EditDialog
+ 	 * EditDialog
 	 * 
 	 * The EditDialog constructor
 	 * 
-	 * @param owner			JFrame 		parent JFrame
-	 * @param cellValue		Object 		call value as object
+	 * @param owner				JFrame		parent JFrame
+	 * @param weekdayShortname	String		german shortname of the weekday - e.g. "Mo" for monday
+	 * @param timeslotFrom		String		timeslot from time as string - e.g. "7:45"
+	 * @param room				String		roomname
+	 * @param course			String		coursename
+	 * @param teachers			ArrayList	ArrayList with teachers' names - e.g. "Wm"
 	 */
-	public EditDialog(Frame owner, Lesson cellValue) {
+	public EditDialog(Frame owner, String weekdayShortname, String timeslotFrom, String room, String course, @SuppressWarnings("rawtypes") ArrayList teachers) {
 		super(owner);
-	    init(cellValue);
+	    init(weekdayShortname, timeslotFrom, room, course, teachers);
 	}
 	
-	// initializing the elements
+	// initializing the elements of the dialog
+	JLabel weekdayShortNameLabel = new JLabel();
+	JLabel timeFromLabel = new JLabel();
 	JLabel labelCourse = new JLabel("Kurs");
 	JComboBox<Object> course = new JComboBox<Object>();
-	
 	JLabel labelRoom = new JLabel("Raum");
 	JComboBox<Object> room = new JComboBox<Object>();
-	
 	JLabel labelTeachers = new JLabel("Lehrer");
 	JList<Object> teachers = new JList<Object>();
-	
 	String[] newDataset = new String[4];
 	JButton saveBtn = new JButton("Speichern");
 	private final JScrollPane scrollPane = new JScrollPane();
+	private final JButton btnLschen = new JButton("Leeren");
 
 	/**
-	 * init
+ 	 * init
 	 * 
 	 * Initialization of the dialog
 	 * 
-	 * @param cellValue		Object		Cell value as object
+	 * @param weekdayShortname	String		
+	 * @param timeslotFrom		String		
+	 * @param roomName			String		name of the room
+	 * @param courseName		String		name of the course
+	 * @param teacherNames		ArrayList	ArrayList with the teachers' names
 	 */
-	private void init(final Lesson cellValue) {
+	private void init(final String weekdayShortname, final String timeslotFrom, String roomName, String courseName, @SuppressWarnings("rawtypes") ArrayList teacherNames) {
 		this.setTitle("Editiere Unterrichtseinheit");
-		getContentPane().setLayout(new GridLayout(4, 2));
+		getContentPane().setLayout(new GridLayout(5, 2));
+		
+		weekdayShortNameLabel.setText(weekdayShortname);
+		getContentPane().add(weekdayShortNameLabel);
+		
+		timeFromLabel.setText(timeslotFrom);
+		getContentPane().add(timeFromLabel);
 		
 		getContentPane().add(labelCourse);
-		course.setModel(new DefaultComboBoxModel<Object>(new String[] {"AE", "IT", "SKIL", "GUS", "SUK", "OGP", "WUG", "IT-WS"}));
-		// set the selected value from db
-		course.setSelectedItem(cellValue.getCourse());
+		
+		// TODO dynamically add courses
+		course.setModel(new DefaultComboBoxModel<Object>(new String[] {"", "AE", "IT", "SKIL", "GUS", "SUK", "OGP", "WUG", "IT-WS"}));
+		// set the selected value
+		if(courseName =="" ) {
+			course.setSelectedItem("");
+		} else {
+			course.setSelectedItem(courseName);
+		}
 		getContentPane().add(course);
 		
 		getContentPane().add(labelRoom);
-		room.setModel(new DefaultComboBoxModel<Object>(new String[] {"221", "208", "H1.1"}));
-		course.setSelectedItem(cellValue.getRoom());
+		// TODO dynamically add rooms
+		room.setModel(new DefaultComboBoxModel<Object>(new String[] {"", "221", "208", "H1.1"}));
+		if(roomName == "") {
+			room.setSelectedItem("");
+		} else {
+			room.setSelectedItem(roomName);
+		}
 		getContentPane().add(room);
 		
 		getContentPane().add(labelTeachers);
 		getContentPane().add(scrollPane);
 		scrollPane.setViewportView(teachers);
+		// TODO dynamically add teachers
 		teachers.setModel(new AbstractListModel<Object>() {
-			String[] values = new String[] {"Wm", "Hr", "Zi", "l1", "Al", "Rt", "Hu"};
+			String[] values = new String[] {"", "Wm", "Hr", "Zi", "l1", "Al", "Rt", "Hu"};
 			public int getSize() {
 				return values.length;
 			}
@@ -88,42 +115,84 @@ public class EditDialog extends JDialog {
 				return values[index];
 			}
 		});
-		teachers.addSelectionInterval(0,2);
-		String[] teacherArray = cellValue.getTeacher().split("\\s+");
-		for(String teacher : teacherArray) {
-			teachers.setSelectedValue(teacher, true);
+		
+		if(teacherNames.isEmpty()) {
+			teachers.setSelectedValue("", true);
+		} else {
+			for (int i = 0; i < teacherNames.size(); i++) {
+				teachers.setSelectedValue(teacherNames.get(i), true);
+			}
 		}
 		
+		/**
+		 *  The save button fires the save event which updates the entry content and table cell
+		 */
 		saveBtn.addActionListener(new ActionListener() {
+			@SuppressWarnings("deprecation")
 			public void actionPerformed(ActionEvent e) {
-				String[] insertedValues = getValues();
 				
-				for(String insertedValue : insertedValues) {
-					System.out.println(insertedValue);
+				// get all teachers
+				ArrayList<String> teachersArray = new ArrayList<String>();
+				for (Object s : teachers.getSelectedValues()) {
+					teachersArray.add(s.toString());
 				}
-				//@toDo: execute the update
-				//@toDo: close dialog on save -important: cellValue holds more information!
+				
+				// trying to update the entry
+				try {
+					System.out.println("[NOTICE] Trying to update entry...");
+					if(MongoDbQueries.updateTimetableEntry(
+							weekdayShortname, 
+							timeslotFrom, 
+							room.getSelectedItem().toString(), 
+							course.getSelectedItem().toString(), 
+							teachersArray
+					)) {
+						System.out.println("[SUCCESS] Sucessfully updated entry.");
+					} else {
+						System.out.println("[ERROR] Could not update entry.");
+					}
+				} catch (Exception e1) {
+					System.out.println("[ERROR] " + e1.getMessage());
+				}
+				
+				// refresh table entries and close the dialog
+				TimetableModel.refreshTable();
+				dispose();
 			}
 		});
 		getContentPane().add(saveBtn);
-	}
-	
-	/**
-	 * getValues
-	 * 
-	 * @return		Returns an Array with the given cell values
-	 */
-	@SuppressWarnings("deprecation")
-	public String[] getValues() {
-		newDataset[0] = (String) course.getSelectedItem().toString();
-		newDataset[1] = (String) room.getSelectedItem().toString();
 		
-		String teacherSTRING = "";
-		for (Object s : teachers.getSelectedValues())
-		{
-		    teacherSTRING = s.toString() + "\t";
-		}
-		newDataset[2] = teacherSTRING;
-		return newDataset;
+		/**
+		 * The delete button fires the save event with empty stings 
+		 * which updates the entry content and table cell
+		 */
+		btnLschen.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				ArrayList<String> teachersArray = new ArrayList<String>();
+				try {
+					System.out.println("[NOTICE] Trying to delete entry...");
+					if(MongoDbQueries.updateTimetableEntry(
+							weekdayShortname, 
+							timeslotFrom, 
+							"", 
+							"", 
+							teachersArray
+					)) {
+						System.out.println("[SUCCESS] Sucessfully cleared entry.");
+					} else {
+						System.out.println("[ERROR] Could not update entry.");
+					}
+				} catch (Exception e1) {
+					System.out.println("[ERROR] " + e1.getMessage());
+				}
+				
+				// Update table entries and close JDialog
+				TimetableModel.refreshTable();
+				dispose();
+			}
+		});
+		
+		getContentPane().add(btnLschen);
 	}
+
 }
