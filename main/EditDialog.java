@@ -10,6 +10,7 @@ import javax.swing.JLabel;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 import javax.swing.JComboBox;
 import javax.swing.DefaultComboBoxModel;
@@ -17,10 +18,12 @@ import javax.swing.JList;
 import javax.swing.AbstractListModel;
 import javax.swing.JScrollPane;
 
+import com.mongodb.DBCursor;
+import com.mongodb.DBObject;
+
 @SuppressWarnings("serial")
 /**
  * class EditDialog
- * 
  * Dialog for editing JTable entries.
  * Opens onclick event.
  * 
@@ -71,19 +74,28 @@ public class EditDialog extends JDialog {
 	 * @param teacherNames		ArrayList	ArrayList with the teachers' names
 	 */
 	private void init(final String weekdayShortname, final String timeslotFrom, String roomName, String courseName, @SuppressWarnings("rawtypes") ArrayList teacherNames) {
+		
+		// configuring the dialog and adding elements
 		this.setTitle("Editiere Unterrichtseinheit");
 		getContentPane().setLayout(new GridLayout(5, 2));
 		
 		weekdayShortNameLabel.setText(weekdayShortname);
 		getContentPane().add(weekdayShortNameLabel);
-		
 		timeFromLabel.setText(timeslotFrom);
 		getContentPane().add(timeFromLabel);
-		
 		getContentPane().add(labelCourse);
 		
-		// TODO dynamically add courses
-		course.setModel(new DefaultComboBoxModel<Object>(new String[] {"", "AE", "IT", "SKIL", "GUS", "SUK", "OGP", "WUG", "IT-WS"}));
+		// read out available courses
+		DBCursor coursesCursor = MongoDbQueries.showAllFromCollection("courses");
+		ArrayList<String> courseNames = new ArrayList<String>();
+		if(coursesCursor!=null && coursesCursor.count()>0) {
+			while(coursesCursor.hasNext()) {
+				DBObject courseObject = coursesCursor.next();
+				String course = (String) courseObject.get("name");
+				courseNames.add(course);
+			}
+		}
+		course.setModel(new DefaultComboBoxModel<Object>(courseNames.toArray()));
 		// set the selected value
 		if(courseName =="" ) {
 			course.setSelectedItem("");
@@ -92,9 +104,19 @@ public class EditDialog extends JDialog {
 		}
 		getContentPane().add(course);
 		
+		
 		getContentPane().add(labelRoom);
-		// TODO dynamically add rooms
-		room.setModel(new DefaultComboBoxModel<Object>(new String[] {"", "221", "208", "H1.1"}));
+		// read out available rooms
+		DBCursor roomsCursor = MongoDbQueries.showAllFromCollection("rooms");
+		ArrayList<String> roomNames = new ArrayList<String>();
+		if(roomsCursor!=null && roomsCursor.count()>0) {
+			while(roomsCursor.hasNext()) {
+				DBObject roomObject = roomsCursor.next();
+				String room = (String) roomObject.get("name");
+				roomNames.add(room);
+			}
+		}
+		room.setModel(new DefaultComboBoxModel<Object>(roomNames.toArray()));
 		if(roomName == "") {
 			room.setSelectedItem("");
 		} else {
@@ -102,12 +124,15 @@ public class EditDialog extends JDialog {
 		}
 		getContentPane().add(room);
 		
+		
 		getContentPane().add(labelTeachers);
 		getContentPane().add(scrollPane);
 		scrollPane.setViewportView(teachers);
-		// TODO dynamically add teachers
+
+		//room.setModel(new DefaultComboBoxModel<Object>(roomNames.toArray()));
 		teachers.setModel(new AbstractListModel<Object>() {
-			String[] values = new String[] {"", "Wm", "Hr", "Zi", "l1", "Al", "Rt", "Hu"};
+			String[] values = (String[]) getTeacherNamesAsArray();
+			//String[] values = new String[] {"", "Wm", "Hr", "Zi", "l1", "Al", "Rt", "Hu"};
 			public int getSize() {
 				return values.length;
 			}
@@ -193,6 +218,30 @@ public class EditDialog extends JDialog {
 		});
 		
 		getContentPane().add(btnLschen);
+	}
+	
+	/**
+	 * getTeacherNamesAsArray
+	 * 
+	 * Method for iterating over the teachers collection and converting the
+	 * resultset into a String array.
+	 * 
+	 * @return		Array		Returns a String Array
+	 */
+	public String[] getTeacherNamesAsArray() {
+		// read out available rooms
+		DBCursor teachersCursor = MongoDbQueries.showAllFromCollection("teachers");
+		ArrayList<String> values = new ArrayList<String>();
+		if(teachersCursor!=null && teachersCursor.count()>0) {
+			while(teachersCursor.hasNext()) {
+				DBObject teacherObject = teachersCursor.next();
+				String teacher = (String) teacherObject.get("name");
+				values.add(teacher);
+			}
+		}
+		Object[] teacherNamesObjectArray = values.toArray();
+		String[] teacherNamesStringArray = Arrays.copyOf(teacherNamesObjectArray, teacherNamesObjectArray.length, String[].class);
+		return teacherNamesStringArray;
 	}
 
 }

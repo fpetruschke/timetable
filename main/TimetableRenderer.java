@@ -12,9 +12,10 @@ import javax.swing.table.TableCellRenderer;
 /**
  * class TimetableRenderer
  * 
- * Renders the timetable with configured styles
+ * Renders the timetable with configured styles and adds the labels containing
+ * the values to the table cells.
  * 
- * @author d.lentz
+ * @author f.petruschke
  *
  */
 public class TimetableRenderer implements TableCellRenderer{
@@ -39,7 +40,11 @@ public class TimetableRenderer implements TableCellRenderer{
 		ArrayList<String> teachers = entry.getTeacher();
 		String teacherNames = "";
 		for (int i = 0; i < teachers.size(); i++) {
-			teacherNames += (teachers.get(i));
+			if(i == teachers.size()-1) {
+				teacherNames += (teachers.get(i));
+			} else {
+				teacherNames += (teachers.get(i)) + ", ";
+			}
 		}
 		
 		lblteacher = new JLabel(teacherNames, SwingConstants.CENTER);

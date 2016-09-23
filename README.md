@@ -1,27 +1,47 @@
 # Warum MongoDB?
 
-Florian: "Bei mir im Betrieb wird mit Massendaten gearbeitet. Bisher habe ich mich nur mit SQL und MySQL auseinandergesetzt. Da wir allerdings für bestimmte Funktionalitäten - mit denen ich bisher noch nicht in Berührung gekommen bin - MongoDB verwenden, war es mir ein Anliegen, mich für die Praxis zu wappnen. Daher meine Entscheidung für MongoDB.
+Bei mir im Betrieb wird mit Massendaten gearbeitet. Bisher habe ich mich intensiv mit MySQL & SQL auseinandergesetzt. Da wir allerdings für bestimmte Funktionalitäten - mit denen ich bisher noch nicht in Berührung gekommen bin - MongoDB verwenden, war es mir ein Anliegen, mich für die Praxis zu wappnen. Daher meine Entscheidung für MongoDB.
 
-Daniel: -- folgt --
+# Voraussetzungen
 
-# Installation
+Voraussetzungen, um das Programm zu starten. In Klammern die genutzte Versionsnummer.
 
-* MongoDB muss installiert werden (Betriebssystemabhängige Installation - wird hier nicht näher erläutert.)  
-* Der Pfad für den zu verwendenden Daten-Ordner muss angelegt werden (Standardmäßig ist dies "/data/db/")  
-* Die Java-Bibliothek für die Nutzung von MongoDB muss in das Java-Projekt inkludiert werden (https://oss.sonatype.org/content/repositories/releases/org/mongodb/mongo-java-driver/3.3.0/)  
+* Java (1.7)
+* MongoDB (3.2.9)
+* Mongo-Java-Driver (3.3.0)
 
-# Stammdaten
+# Probleme
+
+Am meisten Probleme hat mir die andere Vorgehensweise von mongoDB bereitet. Es ist schwierig umzudenken, wenn man es gewohnt ist, mit relationalen Datenbanken zu arbeiten, sich überall auf die Relationen zu verlassen. Man muss bei der Arbeit mit mongoDB versuchen, im Kopf zu "de-normalisieren".  
+
+# Arbeitsschritte
+
+- [x] Aufbau der Projektstruktur mit Trennung von Controllern und Gui  
+- [X] Erstellen des GUIs (Anzeige und Ändern von Daten)  
+- [x] Installation von mongoDB  
+- [x] Herstellen einer Verbindung zum lokalen mongoDB server  
+- [x] Erstellen erster Standard-Abfragen (Select, insert, delete)  
+- [X] Erstellen einer Tabelle, die mit Daten aus der mongoDB gespeist wird  
+- [X] Erstellen einer Editierfunktionalität für Tabellenzellen (einzelne Unterrichtseinheiten)
+- [ ] Hinzufügen von Räumen, Lehrern und Unterrichtsfächern
+- [ ] Editieren von Räumen, Lehrern und Unterrichtsfächern
+
+# Vorbereitung zum Verständnis von mongoDB
+
+Die folgenden Kapitel dienten mir lediglich zur Erarbeitung der Funktionsweise von mongoDB.  
+
+## Stammdaten
 
 Die Stammdaten (Collection und Documents) werden beim Starten der Anwendung erzeugt.  
 Bestehende Stammdaten werden **allerdings zuvor gelöscht**, damit keine Duplikate entstehen.  
 
-# Vokabular
+## Vokabular
 
 - Collection -> "Tabelle" z.B. db.students  
 - Document -> "Zeile" z.B. db.students.findOne()  
 - ObjectId -> beim Erstellen automatisch generierter, eindeutiger Schlüssel (vgl mysql PrimaryKey)  
 
-# Basis-Befehle
+## Basis-Befehle
 
 | Befehl 															| Ergebnis 																	| Typ    |
 | ----------------------------------------------------------------- | ------------------------------------------------------------------------- | ------ |
@@ -42,7 +62,7 @@ Bestehende Stammdaten werden **allerdings zuvor gelöscht**, damit keine Duplika
 | db.students.find({"age" : 20}, {"name" : 1, _id:0 }).skip(2)		| Einschränkung: Überspringt die ersten 2 Documents							| SKIP   |
 | db.students.findOne().explain("executionStats")					| zeigt Statistiken zu der Datenbankabfrage									| STATUS |
 
-# Aggragat-Funktionen
+## Aggragat-Funktionen
 
 | Befehl 																   | Ergebnis 								| Typ    		 |
 | ------------------------------------------------------------------------ | ---------------------------------------| -------------- |
@@ -50,7 +70,7 @@ Bestehende Stammdaten werden **allerdings zuvor gelöscht**, damit keine Duplika
 | db.students.aggregate({$group : {_id: "$age", avgAge: {$avg : 1} } })    | Durchschnittswert einer Ergebnismenge	| GROUP + AVG 	 |
 | db.students.aggregate({$group : {_id: "$age", oldest: {$max : $age} } }) | Durchschnittswert einer Ergebnismenge	| GROUP + AVG 	 |
 
-# Indizes
+## Indizes
 
 Indizes sorgen dafür, dass DB-Abfragen deutlich effizienter ablaufen.  
 Wann immer z.B. mit einer Bedingung das Suchergebnis gefiltert werden soll, beschleunigt das vorherige Hinzufügen eines Index die Abfrage.   
@@ -59,19 +79,3 @@ Je mehr Indizes bestehen, desto weniger bringt die Verwendung von Indizes.
 
 * db.students.ensureIndex({"age":1}) 	--> nutze das Alter als Suchindex  
 * db.students.getIndexes() 				--> zeigt die angelegten Indizes der Collection  
-
-# Probleme
-
-Am meisten Probleme hat uns die andere Denkweise von NoSQL - hier: mongoDB - bereitet. Es ist schwierig umzudenken, wenn man es gewohnt ist, mit relationalen Datenbanken zu arbeiten.  
-Bei der Arbeit mit mongoDB mussten wir versuchen, zu "de-normalisieren".  Wir sind es gewohnt, überall Fremdschlüssel zu nutzen und alle Einträge relational zu tätigen.  
-Das ist mit NoSQL nicht möglich.  
-
-# Arbeitsschritte
-
-- [x] Aufbau der Projektstruktur mit Trennung von Controllern und Gui  
-- [X] Erstellen des GUIs (Anzeige und Ändern von Daten)  
-- [x] Installation von mongoDB  
-- [x] Herstellen einer Verbindung zum lokalen mongoDB server  
-- [x] Erstellen erster Standard-Abfragen (Select, insert, delete)  
-- [X] Erstellen einer Tabelle, die mit Daten aus der mongoDB gespeist wird  
-- [ ] Erstellen von CRUD-Funktionalität im GUI  

@@ -16,7 +16,6 @@ import com.mongodb.DBObject;
  * 
  * Holds the model of the timetable including the data collection from the database
  * 
- * @author d.lentz
  * @author f.petruschke
  *
  */
@@ -25,6 +24,9 @@ public class TimetableModel extends AbstractTableModel{
 	String[] columnNames;
 	
 	@SuppressWarnings("unchecked")
+	/**
+	 * constructor TimetableModel
+	 */
 	public TimetableModel() {
 		
 		// defining columnName
@@ -35,15 +37,16 @@ public class TimetableModel extends AbstractTableModel{
                 "Donnerstag",
                 "Freitag"};
 		
-		// defining the data for the jTable
-		int rows = 10;
-		int columns = 6;
-		entry = new Entry [rows][columns];
-		
+		// defining the data for the jTable beginning with setting the rows and columns
+		// get current number of timeslots for number of rows
+		int rows = (int) MongoDbConnector.db.getCollectionFromString("timeslots").count();
+		// get current number of possible weekdays for number of columns
+		int columns = ((int) MongoDbConnector.db.getCollectionFromString("weekdays").count()) + 1;	// (+1 column for the timeslots!)
+		entry = new Entry [rows][columns];		
 		for(int row = 0; row < rows; row++) {			
 			for(int column = 0; column < columns; column++) {
 				
-				// if first column: show time from and until
+				// if first column: show time from and until (timeslots)
 				if(column == 0) {
 					// insert from time to until time
 					DBObject hour = MongoDbQueries.findOneInCollection("timeslots", "hourId", Integer.toString(row+1));
@@ -51,7 +54,7 @@ public class TimetableModel extends AbstractTableModel{
 					String until = (String) ((BasicBSONObject) hour).get("until");
 					entry[row][column] = new Entry(from, until);
 					
-				// else get the corresponding data
+				// else get the corresponding data (data per timeslot and weekday)
 				} else {
 					
 					// get the timetable column corresponding to weekday and course hour
@@ -64,7 +67,7 @@ public class TimetableModel extends AbstractTableModel{
 						while(timetableColumn.hasNext()) {
 							DBObject hourObject = timetableColumn.next();
 							
-							// get all the teachers names and concatinate them to one string
+							// get all the teachers names
 							Object teachers = hourObject.get("teachers");
 							ArrayList<String> teacherNames = new ArrayList<>();
 							if(teachers instanceof BasicDBList) {
