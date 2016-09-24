@@ -35,29 +35,40 @@ public class Start {
 		Logger mongoLogger = Logger.getLogger( "org.mongodb.driver" );
 		mongoLogger.setLevel(Level.SEVERE); 
 		
-		// initializing the db connection
-		new MongoDbConnector();
-		
-		// fill the db if collections do not exist yet
-		MongoDbInit datafill = new MongoDbInit();
-		if(!datafill.collectionExists("weekdays") && 
-			!datafill.collectionExists("timeslots") &&
-			!datafill.collectionExists("courses") &&
-			!datafill.collectionExists("rooms") && 
-			!datafill.collectionExists("teachers")
-		) {
-			System.out.println("[NOTICE] Not all necessary collections available. Creating ...");
-			datafill.insertData();
-		} else {
-			System.out.println("[SUCCESS] All necessary collections are available.");
+		// try to connect to db and start gui - else show error dialog
+		try {
+			// initializing the db connection
+			new MongoDbConnector();
+			
+			// fill the db if collections do not exist yet
+			MongoDbInit datafill = new MongoDbInit();
+			if(!datafill.collectionExists("weekdays") && 
+				!datafill.collectionExists("timeslots") &&
+				!datafill.collectionExists("courses") &&
+				!datafill.collectionExists("rooms") && 
+				!datafill.collectionExists("teachers")
+			) {
+				System.out.println("[NOTICE] Not all necessary collections available. Creating ...");
+				datafill.insertData();
+			} else {
+				System.out.println("[SUCCESS] All necessary collections are available.");
+			}
+			
+			// show the gui
+			System.out.println("[NOTICE] Showing GUI ...");
+			MainFrame mainFrame = new MainFrame("Stundenplan");
+			mainFrame.setSize(750,700);
+			mainFrame.setLocationRelativeTo(null);
+			mainFrame.setVisible(true);
+		} catch (Exception e) {
+			// show error window
+			ErrorDialog errorDialog = new ErrorDialog();
+			errorDialog.setSize(500,320);
+			errorDialog.setLocationRelativeTo(null);
+			errorDialog.setVisible(true);
+			System.out.println(e.getMessage());
 		}
 		
-		// show the gui
-		System.out.println("[NOTICE] Showing GUI ...");
-		MainFrame mainFrame = new MainFrame("Stundenplan");
-		mainFrame.setSize(750,700);
-		mainFrame.setLocationRelativeTo(null);
-		mainFrame.setVisible(true);
 		
 	}
 

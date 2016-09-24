@@ -19,9 +19,9 @@ import com.mongodb.DB;
 public class MongoDbConnector {
 
 	// initialization and definition of connection params
-	private static String host;
-	private static String port;
-	private static String databaseName;
+	static String host;
+	static String port;
+	static String databaseName;
 	public static MongoClient mongoClient;
 	public static DB db;
 	

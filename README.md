@@ -16,6 +16,8 @@ Voraussetzungen, um das Programm zu verwenden: (in Klammern die jeweils genutzte
 
 Die Konfiguration für die Verbindung zwischen Anwendung und MongoDB wird in der MongoDbConfig.properties-Datei vorgenommen.  
 
+`**Bitte beachten: **` Zu Präsentations-Zwecken wurde die Konfigurationsdatei im Repository so geändert, dass eine Verbindung nicht hergestellt werden kann. Bitte ändern Sie die Konfiguration. Alternativ können Sie die .jar ausführen.
+
 # Datebankstruktur
 
 Die Documents der Collection "timetable" bestehen jeweils aus Objekten der Collections "weekdays", "timeslots", "teachers", "rooms" und "courses".
