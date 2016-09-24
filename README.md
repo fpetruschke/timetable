@@ -1,18 +1,34 @@
+# DIESE DATEI IST FÜR DIE DARSTELLUNG IM BROWSER GEDACHT - LOKAL BITTE DIE DOKUMENTATION.PDF EINSEHEN
+
 # Warum MongoDB?
 
-Bei mir im Betrieb wird mit Massendaten gearbeitet. Bisher habe ich mich intensiv mit MySQL & SQL auseinandergesetzt. Da wir allerdings für bestimmte Funktionalitäten - mit denen ich bisher noch nicht in Berührung gekommen bin - MongoDB verwenden, war es mir ein Anliegen, mich für die Praxis zu wappnen. Daher meine Entscheidung für MongoDB.
+Wir haben die Aufgabe bekommen, eine NoSQL-Datenbank zu nutzen, um in Java eine Anwendung zu schreiben, welche Daten aus der Datenbank lesen und in die Datenbank schreiben kann.
+
+Bei mir im Betrieb wird mit Massendaten gearbeitet. Bisher habe ich mich intensiv mit MySQL & SQL auseinandergesetzt. Da wir allerdings für bestimmte Funktionalitäten - mit denen ich bisher noch nicht in Berührung gekommen bin - MongoDB verwenden, war es mir ein Anliegen, mich für die Praxis vorzubereiten. Daher habe ich mich für das Erstellen der Stundenplan-Anwendung für MongoDB als NoSQL-Datenbank entschieden.
 
 # Voraussetzungen
 
-Voraussetzungen, um das Programm zu starten. In Klammern die genutzte Versionsnummer.
+Voraussetzungen, um das Programm zu verwenden: (in Klammern die jeweils genutzte Versionsnummer)
 
 * Java (1.7)
 * MongoDB (3.2.9)
-* Mongo-Java-Driver (3.3.0)
+* Mongo-Java-Driver (3.4.0-beta1 - im src-Ordner enthalten)
+
+Die Konfiguration für die Verbindung zwischen Anwendung und MongoDB wird in der MongoDbConfig.properties-Datei vorgenommen.  
+
+# Datebankstruktur
+
+Die Documents der Collection "timetable" bestehen jeweils aus Objekten der Collections "weekdays", "timeslots", "teachers", "rooms" und "courses".
+In der pdf-Dokumentation ist die Struktur als Abbildung dargestellt.
+
+# Stammdaten
+
+Ein Stammdaten-Pool (Collection und Documents) wird beim erstmaligen Starten der Anwendung automatisch erzeugt (MongoDbInit). Hierzu muss eventuell die Konfiguration in der MongoDbConfig.properties-Datei angepasst werden.  
 
 # Probleme
 
 Am meisten Probleme hat mir die andere Vorgehensweise von mongoDB bereitet. Es ist schwierig umzudenken, wenn man es gewohnt ist, mit relationalen Datenbanken zu arbeiten, sich überall auf die Relationen zu verlassen. Man muss bei der Arbeit mit mongoDB versuchen, im Kopf zu "de-normalisieren".  
+Außerdem habe ich es als herausfordernd empfunden, die offizielle Dokumentation für den mongodb-java-driver nachzuvollziehen.   
 
 # Arbeitsschritte
 
@@ -22,18 +38,64 @@ Am meisten Probleme hat mir die andere Vorgehensweise von mongoDB bereitet. Es i
 - [x] Herstellen einer Verbindung zum lokalen mongoDB server  
 - [x] Erstellen erster Standard-Abfragen (Select, insert, delete)  
 - [X] Erstellen einer Tabelle, die mit Daten aus der mongoDB gespeist wird  
-- [X] Erstellen einer Editierfunktionalität für Tabellenzellen (einzelne Unterrichtseinheiten)
-- [ ] Hinzufügen von Räumen, Lehrern und Unterrichtsfächern
-- [ ] Editieren von Räumen, Lehrern und Unterrichtsfächern
+- [X] Erstellen einer Editierfunktionalität für Tabellenzellen (einzelne Unterrichtseinheiten)  
+- [X] Hinzufügen von Räumen, Lehrern und Unterrichtsfächern  
+- [X] Löschen von Räumen, Lehrern und Unterrichtsfächern  
+
+# Blackbox-Testfälle
+
+Voraussetzung für das Testen ist die bestehende mongoDB-Verbindung bei geöffneter Anwendung.
+
+## Anlegen einer Unterrichtseinheit
+
+1. Klicke Sie auf eine leere Tabellenzelle (z.B. Montag, 7:45 - 8:30).  
+2. In dem sich öffnenden Dialog wählen Sie je einen Kurs, einen Raum und eine Lehrkraft aus.  
+3. Bestätigen Sie die Eingabe, indem Sie auf "Speichern" klicken  
+4. In der Tabellenzelle sollte nun der soeben erstelle Datensatz angezeigt werden.  
+
+## Editieren einer Unterrichtseinheit
+
+1. Klicke Sie auf eine Tabellenzelle, welche schon gefüllt ist (z.B. Mittwoch, 9:30 - 10:15)  
+2. In dem sich öffnenden Dialog ändern Sie einen Eintrag (z.B. Raum = 208)  
+3. Bestätigen Sie die Eingabe, indem Sie auf "Speichern" klicken.  
+4. In der Tabellenzelle sollte nun der soeben aktualisierte Datensatz angezeigt werden.  
+
+## Löschen einer Unterrichtseinheit
+
+1. Klicken Sie auf einen Zelle/Unterrichtseinheit.  
+2. Klicken Sie in dem sich öffnenden Dialog-Fenster auf den Button "Leeren".  
+3. Das Dialog-Fenster schließt sich und die eben ausgewählte Zelle wurde geleert.  
+
+## Hinzufügen neuer Stammdaten
+
+1. Klicken Sie auf "Stammdaten verwalten".  
+2. In dem sich öffnenden Dialog geben Sie in das Textfelder unter der Fächer-Liste ein neues Fach ein (z.B. "FE").  
+3. Bestätigen Sie das neue Fach durch Klicken des darunterliegenden Buttons mit dem "+"-Symbol.  
+4. Der neu angelegte Fach erscheint als letzter Eintrag in der Fächer-Liste. Das Eingabefeld wurde automatisch geleert.  
+5. Tragen Sie in das Textfeld unter der Lehrer-Liste Lehrernamen bzw. -kürzel ein (z.B. "Hs").  
+6. Bestätigen Sie erneut durch Klick auf den darunterliegenden Button mit dem "+"-Symbol. Das Eingabefeld wurde automatisch geleert.  
+7. Die neue Lehrkraft wird als letzter Eintrag in der Lehrer-Liste angezeigt.  
+8. Tragen Sie in dem Eingabefeld unter der Raum-Liste einen neuen Raum ein (z.B. "23").  
+9. Durch Klicken des "+"-Buttons wird der neue Raum in der Raum-Liste angezeigt. Das Eingabefeld wurde automatisch geleert.  
+5. Klicken Sie auf den Button "Fertig" oder das "X" oben links, um das Dialog-Fenster zu schließen.  
+6. Legen Sie eine neue Unterrichtseinheit in einer leeren Tabellenzelle an, indem Sie auf die Zelle klicken und die soeben erstellten Daten (z.B. "FE", "Hs", "23") auswählen.  
+7. Klicke Sie auf "Speichern".  
+8. Der neue Datensatz erscheint in der von Ihnen ausgewählten Zelle.  
+
+## Löschen eines Stammdatensatzes
+
+1. Klicken Sie auf "Stammdaten verwalten".  
+2. Wählen Sie in dem sich öffnenden Dialog einen Raum aus, indem Sie in der Liste auf den Namen des Raumes klicken.  
+3. Der Name des Raumes wird in das Eingabefeld unter der Raumliste übernommen.  
+4. Klicken Sie auf den Button mit dem Mülleimer-Symbol. Der Raum wird nun gelöscht. Das Eingabefeld wurde automatisch geleert.  
+5. In der Raum-Liste wird der soeben gelöschte Raum nicht mehr angezeigt.  
+6. Klicken Sie auf den Button "Fertig" oder das "X" oben links, um das Dialog-Fenster zu schließen.  
+7. Klicken Sie in der Tabelle auf eine schon befüllte Unterrichtseinheit/Zelle.  
+8. Der soeben gelöschten Raum steht nicht mehr zur Auswahl.  
 
 # Vorbereitung zum Verständnis von mongoDB
 
 Die folgenden Kapitel dienten mir lediglich zur Erarbeitung der Funktionsweise von mongoDB.  
-
-## Stammdaten
-
-Die Stammdaten (Collection und Documents) werden beim Starten der Anwendung erzeugt.  
-Bestehende Stammdaten werden **allerdings zuvor gelöscht**, damit keine Duplikate entstehen.  
 
 ## Vokabular
 

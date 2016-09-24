@@ -56,6 +56,7 @@ public class Start {
 		System.out.println("[NOTICE] Showing GUI ...");
 		MainFrame mainFrame = new MainFrame("Stundenplan");
 		mainFrame.setSize(750,700);
+		mainFrame.setLocationRelativeTo(null);
 		mainFrame.setVisible(true);
 		
 	}

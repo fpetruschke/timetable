@@ -1,9 +1,11 @@
 package main;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
-import org.bson.types.ObjectId;
+import org.bson.BasicBSONObject;
+import org.bson.types.BasicBSONList;
 
 import com.mongodb.BasicDBList;
 import com.mongodb.BasicDBObject;
@@ -93,15 +95,21 @@ public class MongoDbQueries {
 		
 		DBCollection collection = MongoDbConnector.db.getCollection("rooms");
 		
-		try {
-			BasicDBObject document = new BasicDBObject();
-			document.put("name", name);
-			collection.insert(document);
+		DBObject match = findOneInCollection("rooms", "name", name);
+		// check if name is new, else there is no need for inserting
+		if(null == match) {
+			try {
+				BasicDBObject document = new BasicDBObject();
+				document.put("name", name);
+				collection.insert(document);
+				return true;
+				
+			} catch (Exception e) {
+				System.out.println("[ERROR] " + e.getMessage() + "STACKTRACE: " + e.getStackTrace());
+				throw e;
+			}
+		} else {
 			return true;
-			
-		} catch (Exception e) {
-			System.out.println("[ERROR] " + e.getMessage() + "STACKTRACE: " + e.getStackTrace());
-			throw e;
 		}
 	}
 	
@@ -118,15 +126,21 @@ public class MongoDbQueries {
 		
 		DBCollection collection = MongoDbConnector.db.getCollection("courses");
 		
-		try {
-			BasicDBObject document = new BasicDBObject();
-			document.put("name", name);
-			collection.insert(document);
+		DBObject match = findOneInCollection("courses", "name", name);
+		// check if name is new, else there is no need for inserting
+		if(null == match) {
+			try {
+				BasicDBObject document = new BasicDBObject();
+				document.put("name", name);
+				collection.insert(document);
+				return true;
+				
+			} catch (Exception e) {
+				System.out.println("[ERROR] " + e.getMessage() + "STACKTRACE: " + e.getStackTrace());
+				throw e;
+			}
+		} else {
 			return true;
-			
-		} catch (Exception e) {
-			System.out.println("[ERROR] " + e.getMessage() + "STACKTRACE: " + e.getStackTrace());
-			throw e;
 		}
 	}
 	
@@ -143,15 +157,21 @@ public class MongoDbQueries {
 		
 		DBCollection collection = MongoDbConnector.db.getCollection("teachers");
 		
-		try {
-			BasicDBObject document = new BasicDBObject();
-			document.put("name", name);
-			collection.insert(document);
+		DBObject match = findOneInCollection("teachers", "name", name);
+		// check if name is new, else there is no need for inserting
+		if(null == match) {
+			try {
+				BasicDBObject document = new BasicDBObject();
+				document.put("name", name);
+				collection.insert(document);
+				return true;
+				
+			} catch (Exception e) {
+				System.out.println("[ERROR] " + e.getMessage() + "STACKTRACE: " + e.getStackTrace());
+				throw e;
+			}
+		} else {
 			return true;
-			
-		} catch (Exception e) {
-			System.out.println("[ERROR] " + e.getMessage() + "STACKTRACE: " + e.getStackTrace());
-			throw e;
 		}
 	}
 	
@@ -169,6 +189,23 @@ public class MongoDbQueries {
 		DBCollection collection = MongoDbConnector.db.getCollection(collectionName);
 		DBObject query = new BasicDBObject(key, value);
 		DBObject result = collection.findOne(query);
+		return result;
+	}
+	
+	/**
+	 * method findOneInCollection
+	 * 
+	 * Returns result from given collection
+	 * 
+	 * @param collectionName
+	 * @param key
+	 * @param value
+	 * @return
+	 */
+	public static DBCursor findObjectsInCollection(String collectionName, String key, DBObject value) {
+		DBCollection collection = MongoDbConnector.db.getCollection(collectionName);
+		DBObject query = new BasicDBObject(key, value);
+		DBCursor result = collection.find(query);
 		return result;
 	}
 	
@@ -272,30 +309,118 @@ public class MongoDbQueries {
 	/**
 	 * method deleteDocumentFromCollection
 	 * 
-	 * Deletes the document according to the given id
+	 * Deletes the document according to the given name.
+	 * Important: Is only meant for usage with collections
+	 * rooms, courses and teachers
 	 * 
-	 * @param collection	name of the DBCollection to delete from
-	 * @param idOfDocument	Id of the document to delete
-	 * @return				Returns true on success
-	 * @throws Exception	Throws exception on failure
+	 * @param 	collection		String		name of the DBCollection to delete from
+	 * @param 	name			String		name of the document to delete
+	 * @return					boolean		Returns true on success
+	 * @throws Exception					Throws exception on failure
 	 */
-	public static boolean deleteDocumentFromCollection(String collectionName, String idOfDocument) throws Exception {
+	@SuppressWarnings("unchecked")
+	public static boolean deleteDocumentFromCollection(String collectionName, String name) throws Exception {
 		
-		DBCollection collection = MongoDbConnector.db.getCollection(collectionName);
-		try {
-			BasicDBObject query = new BasicDBObject();
-		    query.put("_id", new ObjectId(idOfDocument));
-		    DBObject dbObj = collection.findOne(query);
-			collection.remove(dbObj);
-			return true;
-			
-		} catch (Exception e) {
-			System.out.println("[ERROR] " + e.getMessage() + "STACKTRACE: " + e.getStackTrace());
-			throw e;
+		if (collectionName != "teachers" && collectionName != "rooms" && collectionName != "courses") {
+			System.out.println("[ERROR] You are not allowed to delete documents from " + collectionName);
+			return false;
+		} else {
+			DBCollection collection = MongoDbConnector.db.getCollection(collectionName);
+			DBObject match = findOneInCollection(collectionName, "name", name);
+			// check if name is existent, else it can be ignored
+			if(null != match) {
+				System.out.println("[NOTICE] Trying to delete " + name + " from " + collectionName);
+				try {
+					
+					// update the timetable and set the "notSet" object instead of the deleted one
+					String column = "";
+					switch(collectionName) {
+						case("rooms"):
+							column = "room";
+							break;
+						case("teachers"):
+							column = "teachers";
+							break;
+						case("courses"):
+							column = "course";
+							break;
+						default:
+							break;
+					}
+					
+					DBObject notSet = findOneInCollection(collectionName, "name", "n.a.");
+					DBObject entryToDelete = findOneInCollection(collectionName, "name", name);
+					
+					DBCursor occurences = findObjectsInCollection("timetable", column, entryToDelete);
+					if(occurences.size()<=0) {
+						System.out.println("[WARNING] For some reason you don't get a result here...");
+					}
+					while(occurences.hasNext()) {
+						DBObject entry = occurences.next();
+						
+						DBObject weekday = (DBObject) entry.get("weekday");
+						String weekdayShortname = (String) weekday.get("shortname");
+						
+						DBObject timeslot = (DBObject) entry.get("timeslot");
+						String timeslotFrom = (String) timeslot.get("from");
+						
+						DBObject room = (DBObject) entry.get("room");
+						String roomName = (String) room.get("name");
+						
+						DBObject course = (DBObject) entry.get("course");
+						String courseName = (String) course.get("name");
+						
+						ArrayList<String> teachersArray = new ArrayList<String>();
+						Object teachers = entry.get("teachers");
+						if(teachers instanceof BasicDBList) {
+							for (int i = 0; i < ((ArrayList<Object>) teachers).size(); i++) {
+								Object listElement = ((BasicBSONList) teachers).get(i);
+								Object teacher = ((BasicBSONObject) listElement).get("teacher");
+								String teacherName = (String) ((BasicBSONObject) teacher).get("name"); 
+								teachersArray.add(teacherName);
+							}
+						} else {
+							String teachersName = (String) ((BasicBSONObject) teachers).get("name");
+							teachersArray.add(teachersName);
+						}
+												
+						if(column == "course") {
+							courseName = (String) notSet.get("name");
+						} else if (column == "room") {
+							roomName = (String) notSet.get("name");
+						} else if (column == "teachers") {
+							teachersArray.clear();
+							teachersArray.add((String) notSet.get("name"));
+						}
+						
+						MongoDbQueries.updateTimetableEntry(
+								weekdayShortname, 
+								timeslotFrom, 
+								roomName, 
+								courseName, 
+								teachersArray);						
+					}
+					System.out.println("[NOTICE] Updated all occurences in timetable collection");
+					
+					// actual delete the entry
+					BasicDBObject query = new BasicDBObject();
+				    query.put("name", name);
+				    DBObject dbObj = MongoDbConnector.db.getCollection(collectionName).findOne(query);
+					collection.remove(dbObj);
+					System.out.println("[SUCCESS] Deleted " + name + " from " + collectionName);
+					return true;
+					
+				} catch (Exception e) {
+					System.out.println("[ERROR] " + e.getMessage() + "STACKTRACE: " + e.getStackTrace());
+					throw e;
+				}
+			} else {
+				System.out.println("[NOTICE] No document found for name = " + name);
+				return true;
+			}
 		}
-		
 	}
-	
+
 	/**
 	 * method showAllFromCollection
 	 * 
@@ -305,11 +430,22 @@ public class MongoDbQueries {
 	public static DBCursor showAllFromCollection(String collectionName) {
 		DBCollection collection = MongoDbConnector.db.getCollection(collectionName);
 		DBCursor cursor = collection.find();
-		
 		return cursor;
 	}
 	
-	// TODO add comment
+	/**
+	 * updateTimetableEntry
+	 * 
+	 * Method for updating the current timetable.
+	 * 
+	 * @param weekdayShortname	String			german shortname of the weekday - e.g. "Mo"
+	 * @param timeslotFrom		String			time when the course starts - e.g. "7:45"
+	 * @param roomName			String			name of the room
+	 * @param courseName		String			name of the course
+	 * @param teachersArray		ArrayList		ArrayList containing the teachers who lead the course
+	 * @return					boolean			True if successful.
+	 * @throws Exception						Throws exception if update could not be executed
+	 */
 	public static boolean updateTimetableEntry(String weekdayShortname, String timeslotFrom, String roomName, String courseName, ArrayList<String> teachersArray) throws Exception {
 		
 		DBCollection collection = MongoDbConnector.db.getCollection("timetable");
@@ -337,7 +473,6 @@ public class MongoDbQueries {
 				}
 				editedEntry.append("teachers", dbl);
 				
-				// TODO : check set!
 				collection.update(currentEntry, editedEntry);
 				return true;
 			}
@@ -349,4 +484,27 @@ public class MongoDbQueries {
 			
 	}
 	
+	/**
+	 * getTeacherNamesAsArray
+	 * 
+	 * Method for iterating over the teachers collection and converting the
+	 * resultset into a String array.
+	 * 
+	 * @return		Array		Returns a String Array
+	 */
+	public static String[] getTeacherNamesAsArray() {
+		// read out available rooms
+		DBCursor teachersCursor = MongoDbQueries.showAllFromCollection("teachers");
+		ArrayList<String> values = new ArrayList<String>();
+		if(teachersCursor!=null && teachersCursor.count()>0) {
+			while(teachersCursor.hasNext()) {
+				DBObject teacherObject = teachersCursor.next();
+				String teacher = (String) teacherObject.get("name");
+				values.add(teacher);
+			}
+		}
+		Object[] teacherNamesObjectArray = values.toArray();
+		String[] teacherNamesStringArray = Arrays.copyOf(teacherNamesObjectArray, teacherNamesObjectArray.length, String[].class);
+		return teacherNamesStringArray;
+	}
 }

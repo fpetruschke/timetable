@@ -109,7 +109,7 @@ public class MongoDbInit {
 		// creating the collection rooms (deleting it first for janitoring)
 		MongoDbCollection.deleteCollection(MongoDbConnector.db.getCollection("rooms"));
 		MongoDbCollection.createCollection("rooms");
-		String[] rooms = new String[] {"", "221", "208", "H1.1"};
+		String[] rooms = new String[] {"", "n.a.", "221", "208", "H1.1"};
 		for(String room : rooms){
 			MongoDbQueries.insertRoom(room);
 	    }
@@ -117,7 +117,7 @@ public class MongoDbInit {
 		// creating the collection courses (deleting it first for janitoring)
 		MongoDbCollection.deleteCollection(MongoDbConnector.db.getCollection("courses"));
 		MongoDbCollection.createCollection("courses");
-		String[] courses = new String[] {"", "AE", "IT", "SKIL", "GUS", "SUK", "OGP", "WUG", "IT-WS"};
+		String[] courses = new String[] {"", "n.a.", "AE", "IT", "SKIL", "GUS", "SUK", "OGP", "WUG", "IT-WS"};
 		for(String course : courses){
 			MongoDbQueries.insertCourse(course);
 	    }
@@ -125,7 +125,7 @@ public class MongoDbInit {
 		// creating the collection teachers (deleting it first for janitoring)
 		MongoDbCollection.deleteCollection(MongoDbConnector.db.getCollection("teachers"));
 		MongoDbCollection.createCollection("teachers");
-		String[] teachers = new String[] {"", "Wm", "Hr", "Zi", "l1", "Al", "Rt", "Hu"};
+		String[] teachers = new String[] {"", "n.a.", "Wm", "Hr", "Zi", "l1", "Al", "Rt", "Hu"};
 		for(String teacher : teachers){
 			MongoDbQueries.insertTeacher(teacher);
 	    }

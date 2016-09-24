@@ -10,7 +10,6 @@ import javax.swing.JLabel;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
-import java.util.Arrays;
 
 import javax.swing.JComboBox;
 import javax.swing.DefaultComboBoxModel;
@@ -20,6 +19,7 @@ import javax.swing.JScrollPane;
 
 import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
+import javax.swing.ImageIcon;
 
 @SuppressWarnings("serial")
 /**
@@ -131,8 +131,7 @@ public class EditDialog extends JDialog {
 
 		//room.setModel(new DefaultComboBoxModel<Object>(roomNames.toArray()));
 		teachers.setModel(new AbstractListModel<Object>() {
-			String[] values = (String[]) getTeacherNamesAsArray();
-			//String[] values = new String[] {"", "Wm", "Hr", "Zi", "l1", "Al", "Rt", "Hu"};
+			String[] values = (String[]) MongoDbQueries.getTeacherNamesAsArray();
 			public int getSize() {
 				return values.length;
 			}
@@ -152,6 +151,7 @@ public class EditDialog extends JDialog {
 		/**
 		 *  The save button fires the save event which updates the entry content and table cell
 		 */
+		saveBtn.setIcon(new ImageIcon(EditDialog.class.getResource("/main/add.png")));
 		saveBtn.addActionListener(new ActionListener() {
 			@SuppressWarnings("deprecation")
 			public void actionPerformed(ActionEvent e) {
@@ -191,6 +191,7 @@ public class EditDialog extends JDialog {
 		 * The delete button fires the save event with empty stings 
 		 * which updates the entry content and table cell
 		 */
+		btnLschen.setIcon(new ImageIcon(EditDialog.class.getResource("/main/delete.png")));
 		btnLschen.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				ArrayList<String> teachersArray = new ArrayList<String>();
@@ -219,29 +220,4 @@ public class EditDialog extends JDialog {
 		
 		getContentPane().add(btnLschen);
 	}
-	
-	/**
-	 * getTeacherNamesAsArray
-	 * 
-	 * Method for iterating over the teachers collection and converting the
-	 * resultset into a String array.
-	 * 
-	 * @return		Array		Returns a String Array
-	 */
-	public String[] getTeacherNamesAsArray() {
-		// read out available rooms
-		DBCursor teachersCursor = MongoDbQueries.showAllFromCollection("teachers");
-		ArrayList<String> values = new ArrayList<String>();
-		if(teachersCursor!=null && teachersCursor.count()>0) {
-			while(teachersCursor.hasNext()) {
-				DBObject teacherObject = teachersCursor.next();
-				String teacher = (String) teacherObject.get("name");
-				values.add(teacher);
-			}
-		}
-		Object[] teacherNamesObjectArray = values.toArray();
-		String[] teacherNamesStringArray = Arrays.copyOf(teacherNamesObjectArray, teacherNamesObjectArray.length, String[].class);
-		return teacherNamesStringArray;
-	}
-
 }

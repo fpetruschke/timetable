@@ -5,18 +5,8 @@ import java.awt.Dimension;
 import java.awt.Frame;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.ArrayList;
-
 import javax.swing.*;
-
-import com.mongodb.BasicDBList;
-import com.mongodb.DBCursor;
-import com.mongodb.DBObject;
-
 import javax.swing.border.BevelBorder;
-
-import org.bson.BasicBSONObject;
-import org.bson.types.BasicBSONList;
 
 /**
  * class MainFrame
@@ -74,6 +64,8 @@ public class MainFrame extends JFrame {
         			);
 		        	
 		        	dialog.setSize(450, 300);
+		        	dialog.setLocationRelativeTo(null);
+		        	dialog.setModal(true);
 		            dialog.setVisible(true);
 		        }
 		    }
@@ -101,54 +93,20 @@ public class MainFrame extends JFrame {
 		btnNewButton.setBounds(423, 638, 304, 25);
 		getContentPane().add(btnNewButton);
 		
-		// for debugging purposes - uncomment the last line (getContentPane().add(btnNewButton_1);) for using it
-		JButton btnNewButton_1 = new JButton("Log Rooms, Teachers and Courses");
-		btnNewButton_1.addActionListener(new ActionListener() {
-			@SuppressWarnings("unchecked")
+		// button for managing the base data in a dialog
+		JButton btnStammdatenverwaltung = new JButton("Stammdatenverwaltung");
+		btnStammdatenverwaltung.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				
-				// preparing the names, times and filters for queries
-				String[] weekdayShortnames = new String[] { "Mo", "Di", "Mi", "Do", "Fr" };
-				String[] timeslotStarts = new String[] { "7:45", "8:30", "9:30", "10:15", "11:30", "12:15", "13:30", "14:15", "15:15", "16:00" };
-				String[] filters = new String[] { "room", "course", "teachers" };
-				
-				// get all the data for each day and timespan from the database
-				for(String weekdayShortname : weekdayShortnames) {
-					for (String timeslotStart : timeslotStarts) {
-						
-						DBObject weekday = MongoDbQueries.findOneInCollection("weekdays", "shortname", weekdayShortname);
-						DBObject timeslot = MongoDbQueries.findOneInCollection("timeslots", "from", timeslotStart);
-						
-						DBCursor cursor = MongoDbQueries.findOneInCollectionAnd("timetable", "weekday", weekday, "timeslot", timeslot);
-						
-						// iterating over the resultset for timetable
-						String result = "";
-						while(cursor.hasNext()) {
-							DBObject element = cursor.next();
-							for(String filter : filters) {
-								Object object = element.get(filter); 
-								// if object is BasicDBList of teacher
-								if(object instanceof BasicDBList) {
-									for (int i = 0; i < ((ArrayList<Object>) object).size(); i++) {
-										Object listElement = ((BasicBSONList) object).get(i);
-										Object teacher = ((BasicBSONObject) listElement).get("teacher");
-										String teacherName = (String) ((BasicBSONObject) teacher).get("name"); 
-										result += teacherName + ", ";
-									}
-								} else {
-									String name = (String) ((BasicBSONObject) object).get("name");
-									result += name + ", ";
-								}
-							}
-							// result the value of the room, the course and the teacher/s
-							System.out.println(result);
-						}
-					}
-				}
+				BaseDataDialog dialog = new BaseDataDialog((Frame) JFrame);
+	        	dialog.setSize(450, 414);
+	        	dialog.setLocationRelativeTo(null);
+	        	dialog.setModal(true);
+	            dialog.setVisible(true);
 			}
 		});
-		btnNewButton_1.setBounds(24, 638, 304, 25);
-		//getContentPane().add(btnNewButton_1);
+		btnStammdatenverwaltung.setBounds(34, 638, 252, 25);
+		getContentPane().add(btnStammdatenverwaltung);
+		
 
 	}
 }
